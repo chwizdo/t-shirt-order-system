@@ -1,0 +1,43 @@
+[debug] [2022-09-29T15:18:13.641Z] ----------------------------------------------------------------------
+[debug] [2022-09-29T15:18:13.642Z] Command:       /opt/homebrew/Cellar/node/17.4.0/bin/node /opt/homebrew/bin/firebase init
+[debug] [2022-09-29T15:18:13.642Z] CLI Version:   11.11.0
+[debug] [2022-09-29T15:18:13.643Z] Platform:      darwin
+[debug] [2022-09-29T15:18:13.643Z] Node Version:  v17.4.0
+[debug] [2022-09-29T15:18:13.643Z] Time:          Thu Sep 29 2022 23:18:13 GMT+0800 (Malaysia Time)
+[debug] [2022-09-29T15:18:13.643Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2022-09-29T15:18:13.646Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2022-09-29T15:18:13.646Z] > authorizing via signed-in user (chwizdo@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/chwizdo/Projects/Scrapboard - React/2022 09 19 T Shirt Order System/app
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2022-09-29T15:18:25.662Z] > refreshing access token with scopes: []
+[debug] [2022-09-29T15:18:25.665Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2022-09-29T15:18:25.665Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2022-09-29T15:18:25.840Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2022-09-29T15:18:25.840Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2022-09-29T15:18:25.841Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2022-09-29T15:18:26.232Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 401
+[debug] [2022-09-29T15:18:26.232Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2022-09-29T15:18:26.233Z] HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2022-09-29T15:18:27.313Z] FirebaseError: HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+    at responseToError (/opt/homebrew/lib/node_modules/firebase-tools/lib/responseToError.js:49:12)
+    at RetryOperation._fn (/opt/homebrew/lib/node_modules/firebase-tools/lib/apiv2.js:288:77)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+[error] 
+[error] Error: Failed to list Firebase projects. See firebase-debug.log for more info.
