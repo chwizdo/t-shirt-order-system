@@ -12,9 +12,10 @@ import {
 import { useState } from "react";
 import NumberButton from "../../components/NumberButton";
 import { useHistory } from "react-router-dom";
+import { withFirebase } from "../../services/Firebase";
 
-export default () => {
-  const onMenuClicked = () => {};
+const Home = ({ firebase }) => {
+  const onMenuClicked = () => firebase.signOut();
   const onNewOrderClicked = () => {
     history.push("/new");
   };
@@ -91,3 +92,5 @@ export default () => {
     </div>
   );
 };
+
+export default withFirebase(Home);
