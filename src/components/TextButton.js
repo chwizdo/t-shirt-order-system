@@ -1,6 +1,9 @@
+import { EllipsisHorizontalIcon } from "@heroicons/react/24/solid";
+
 export default ({
   text = "Text",
   theme = "dark", // Choices: dark, light
+  isLoading = false,
   onClicked = () => {},
 }) => (
   <div>
@@ -13,11 +16,10 @@ export default ({
       ${
         theme != "light" &&
         "bg-black hover:bg-black-hover active:bg-black-hover text-white"
-      }
-      `}
-      onClick={onClicked}
+      }`}
+      onClick={isLoading ? null : onClicked}
     >
-      {text}
+      {isLoading ? <EllipsisHorizontalIcon className="h-6 w-6" /> : text}
     </button>
   </div>
 );

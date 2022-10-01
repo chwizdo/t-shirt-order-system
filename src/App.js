@@ -11,7 +11,7 @@ import SignUp from "./pages/SignUp";
 import Forget from "./pages/Forget";
 import { withFirebase } from "./services/Firebase";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, updateProfile } from "firebase/auth";
 
 const App = ({ firebase }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);

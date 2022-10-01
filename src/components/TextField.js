@@ -1,7 +1,7 @@
 export default ({
   placeholder = "Placeholder",
   value = "",
-  onChanged = "",
+  onChanged = () => {},
 }) => (
   <div>
     <input

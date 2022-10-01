@@ -15,7 +15,7 @@ import { useHistory } from "react-router-dom";
 import { withFirebase } from "../../services/Firebase";
 
 const Home = ({ firebase }) => {
-  const onMenuClicked = () => firebase.signOut();
+  const onMenuClicked = () => firebase.logout();
   const onNewOrderClicked = () => {
     history.push("/new");
   };

@@ -1,6 +1,13 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -21,21 +28,56 @@ class Firebase {
     this.db = getFirestore(this.app);
   }
 
-  //   createUserWithEmailAndPassword(email, password) {
-  //     return this.auth.createUserWithEmailAndPassword(email, password);
-  //   }
-
-  async signInWithEmailAndPassword(email, password) {
+  async signUp(name, email, password) {
     try {
-      await signInWithEmailAndPassword(this.auth, email, password);
+      // TODO Check invitation code, mark as used.
+      const userCredential = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        password
+      );
+      await updateProfile(userCredential.user, { displayName: name });
+      return null;
     } catch (e) {
-      console.log(e.code);
-      console.log(e.message);
+      return this.formatErrorCode(e.code);
     }
   }
 
-  async signOut() {
-    await signOut(this.auth);
+  async login(email, password) {
+    try {
+      await signInWithEmailAndPassword(this.auth, email, password);
+    } catch (e) {
+      return this.formatErrorCode(e.code);
+    }
+  }
+
+  async logout() {
+    try {
+      await signOut(this.auth);
+    } catch (e) {
+      return this.formatErrorCode(e.code);
+    }
+  }
+
+  async updateName(user, name) {
+    try {
+      await updateProfile(user, { displayName: name });
+    } catch (e) {
+      return this.formatErrorCode(e.code);
+    }
+  }
+
+  async resetPassword(email) {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+    } catch (e) {
+      return this.formatErrorCode(e.code);
+    }
+  }
+
+  formatErrorCode(errorCode) {
+    const errorMessage = errorCode.split("auth/")[1].replaceAll("-", " ");
+    return errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1);
   }
 
   //   serverTimeStamp() {
