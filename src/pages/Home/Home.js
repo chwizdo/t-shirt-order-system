@@ -42,8 +42,6 @@ const Home = ({ firebase }) => {
     const status = await firebase.getChoices("status");
     setStatus(status);
 
-    console.log(await firebase.getOrder("6zVCmgE12IzraoOMXCZj"));
-
     setIsLoading(false);
   };
 
@@ -106,6 +104,7 @@ const Home = ({ firebase }) => {
                   key={summaries[key].id}
                   order={summaries[key]}
                   status={status}
+                  onEntryClicked={() => history.push(`/${key}`)}
                 />
               );
             })}

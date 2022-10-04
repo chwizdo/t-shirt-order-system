@@ -4,27 +4,32 @@ import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 export default ({
   placeholder = "Placeholder",
-  list = [],
+  list = {},
   value = null,
   onChanged = () => {},
 }) => {
-  //   const [selected, setSelected] = useState(null);
   const [query, setQuery] = useState("");
   const [filtered, setFiltered] = useState(list);
 
   useEffect(() => {
-    const filtered =
-      query === ""
-        ? list
-        : list.filter((item) =>
-            item[1]
-              .toLowerCase()
-              .replace(/\s+/g, "")
-              .includes(query.toLowerCase().replace(/\s+/g, ""))
-          );
-
-    setFiltered(filtered);
+    if (query === "") {
+      setFiltered(list);
+    } else {
+      const filtered = {};
+      for (const key in list) {
+        if (!isMatched(list[key].name, query)) continue;
+        filtered[key] = list[key];
+      }
+      setFiltered(filtered);
+    }
   }, [query]);
+
+  const isMatched = (string, query) => {
+    return string
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .includes(query.toLowerCase().replace(/\s+/g, ""));
+  };
 
   return (
     <div>
@@ -33,7 +38,7 @@ export default ({
           <div className="relative">
             <Combobox.Input
               className="w-full border-2 border-grey h-13 pl-6 pr-14 rounded-lg leading-tight text-black outline-none focus:border-black transition"
-              displayValue={(item) => item}
+              displayValue={(key) => list[key].name}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={placeholder}
             />
@@ -52,24 +57,28 @@ export default ({
             afterLeave={() => setQuery("")}
           >
             <Combobox.Options className="absolute mt-4 max-h-60 w-full overflow-y-auto rounded-lg bg-white outline-none border-2 border-black z-50">
-              {filtered.length === 0 ? (
+              {Object.keys(filtered).length === 0 ? (
                 <div className="cursor-default select-none h-13 px-6 text-light-grey flex items-center">
                   Nothing found.
                 </div>
               ) : (
-                filtered.map((item) => (
-                  <Combobox.Option
-                    key={item[0]}
-                    className={({ active }) =>
-                      `cursor-default select-none h-13 px-6 flex items-center inset-0 w-full border-none ${
-                        active ? "bg-black text-white" : "text-black"
-                      }`
-                    }
-                    value={item[1]}
-                  >
-                    <div className="truncate">{item[1]}</div>
-                  </Combobox.Option>
-                ))
+                Object.keys(filtered).map((key) => {
+                  console.log(filtered);
+                  console.log(key);
+                  return (
+                    <Combobox.Option
+                      key={key}
+                      className={({ active }) =>
+                        `cursor-default select-none h-13 px-6 flex items-center inset-0 w-full border-none ${
+                          active ? "bg-black text-white" : "text-black"
+                        }`
+                      }
+                      value={key}
+                    >
+                      <div className="truncate">{filtered[key].name}</div>
+                    </Combobox.Option>
+                  );
+                })
               )}
             </Combobox.Options>
           </Transition>

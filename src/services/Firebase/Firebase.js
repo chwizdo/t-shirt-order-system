@@ -103,10 +103,10 @@ class Firebase {
     const summaries = {};
     for (const orderDoc of orderDocs) {
       summaries[orderDoc.id] = {
-        customer: await this.getOrderNestedValue(orderDoc, "customerRef"),
-        date: this.getOrderDate(orderDoc),
-        id: this.getOrderSingleValue(orderDoc, "id"),
-        status: await this.getOrderNestedValue(orderDoc, "statusRef"),
+        customer: await this.getReferenceValue(orderDoc, "customerRef"),
+        date: this.getSingleDate(orderDoc),
+        id: this.getSingleValue(orderDoc, "id"),
+        status: await this.getReferenceValue(orderDoc, "statusRef"),
       };
     }
     return summaries;
@@ -117,38 +117,90 @@ class Firebase {
     const orderDoc = await getDoc(doc(this.db, "orders", orderId));
     return {
       [orderDoc.id]: {
-        customer: await this.getOrderNestedValue(orderDoc, "customerRef"),
-        date: this.getOrderDate(orderDoc),
-        design: this.getOrderSingleValue(orderDoc, "design"),
-        designer: await this.getOrderNestedValue(orderDoc, "designerRef"),
-        id: this.getOrderSingleValue(orderDoc, "id"),
-        material: await this.getOrderNestedValue(orderDoc, "materialRef"),
-        remark: this.getOrderSingleValue(orderDoc, "remark"),
-        status: await this.getOrderNestedValue(orderDoc, "statusRef"),
+        customer: await this.getReferenceValue(orderDoc, "customerRef"),
+        date: this.getSingleDate(orderDoc),
+        design: this.getSingleValue(orderDoc, "design"),
+        designer: await this.getReferenceValue(orderDoc, "designerRef"),
+        id: this.getSingleValue(orderDoc, "id"),
+        material: await this.getReferenceValue(orderDoc, "materialRef"),
+        remark: this.getSingleValue(orderDoc, "remark"),
+        status: await this.getReferenceValue(orderDoc, "statusRef"),
+        variations: await this.getOrderVariations(orderDoc),
       },
     };
   }
 
+  async getOrderVariations(orderDoc) {
+    const orderDocPath = orderDoc.ref.path;
+    const variationsCollection = collection(
+      this.db,
+      `${orderDocPath}/variations`
+    );
+    const variationDocs = (await getDocs(variationsCollection)).docs;
+
+    const variations = {};
+    for (const variationDoc of variationDocs) {
+      variations[variationDoc.id] = {
+        collar: await this.getReferenceValue(variationDoc, "collarRef"),
+        color: await this.getSingleValue(variationDoc, "color"),
+        sleeve: await this.getReferenceValue(variationDoc, "sleeveRef"),
+        sizes: await this.getVariationSizes(variationDoc),
+      };
+    }
+    return variations;
+  }
+
+  async getVariationSizes(variationDoc) {
+    const variationDocPath = variationDoc.ref.path;
+    const sizesCollection = collection(this.db, `${variationDocPath}/sizes`);
+    const sizeDocs = (await getDocs(sizesCollection)).docs;
+
+    const sizes = {};
+    for (const sizeDoc of sizeDocs) {
+      sizes[sizeDoc.id] = {
+        size: await this.getReferenceValue(sizeDoc, "sizeRef"),
+        prints: await this.getSizePrints(sizeDoc),
+      };
+    }
+    return sizes;
+  }
+
+  async getSizePrints(sizeDoc) {
+    const sizeDocPath = sizeDoc.ref.path;
+    const printsCollection = collection(this.db, `${sizeDocPath}/prints`);
+    const printDocs = (await getDocs(printsCollection)).docs;
+
+    const prints = {};
+    for (const printDoc of printDocs) {
+      prints[printDoc.id] = {
+        name: this.getSingleValue(printDoc, "name"),
+        number: this.getSingleValue(printDoc, "number"),
+        quantity: this.getSingleValue(printDoc, "quantity"),
+      };
+    }
+    return prints;
+  }
+
   // Get designer from order document.
   // Returns null if designer document doesn't exist.
-  async getOrderNestedValue(orderDoc, key) {
-    if (!orderDoc.data()[key]) return null;
-    const nestedDoc = await getDoc(orderDoc.data()[key]);
+  async getReferenceValue(doc, key) {
+    if (!doc.data()[key]) return null;
+    const nestedDoc = await getDoc(doc.data()[key]);
     if (!nestedDoc.exists) return null;
     return { [nestedDoc.id]: { name: nestedDoc.data().name || null } };
   }
 
   // Get creation date from order document.
   // Returns null if creation date doesn't exist.
-  getOrderDate(orderDoc) {
-    const date = this.getOrderSingleValue(orderDoc, "date");
+  getSingleDate(doc) {
+    const date = this.getSingleValue(doc, "date");
     return date ? new Date(date.seconds * 1000) : null;
   }
 
   // Get an order property from order document.
   // Returns null if order property doesn't exist.
-  getOrderSingleValue(orderDoc, key) {
-    return orderDoc.data()[key] || null;
+  getSingleValue(doc, key) {
+    return doc.data()[key] || null;
   }
 
   // serverTimeStamp() {
