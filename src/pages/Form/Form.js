@@ -108,6 +108,23 @@ const Form = ({ firebase }) => {
     setOrder(tempOrder);
   };
 
+  const getVariationDetail = (variationId, key) => {
+    const tempOrder = { ...order };
+    return tempOrder[orderId].variations[variationId][key];
+  };
+
+  const getVariationReferenceId = (variationId, key) => {
+    const reference = getVariationDetail(variationId, key);
+    if (!reference) return reference;
+    return Object.keys(reference)[0];
+  };
+
+  const updateVariationDetail = (variationId, key, value) => {
+    const tempOrder = { ...order };
+    tempOrder[orderId].variations[variationId][key] = value;
+    setOrder(tempOrder);
+  };
+
   const customStyles = {
     content: {
       width: "320px",
@@ -211,200 +228,195 @@ const Form = ({ firebase }) => {
           </div>
         </div>
 
-        {variations.map((variation, variationIdx) => {
-          return (
-            <div key={variationIdx}>
-              {/* Variation title */}
+        {Object.keys(getOrderDetails("variations")).map((vId, vIdx) => (
+          <div key={vId}>
+            {/* Variation title */}
 
-              <div className="text-xl leading-tight mb-12">
-                VARIATION {variationIdx + 1}
-              </div>
+            <div className="text-xl leading-tight mb-12">
+              VARIATION {vIdx + 1}
+            </div>
 
-              <div className="flex space-x-4 mb-6">
-                {/* Variation remove button */}
+            <div className="flex space-x-4 mb-6">
+              {/* Variation remove button */}
 
-                <IconButton
-                  Icon={TrashIcon}
-                  theme="error"
-                  onClick={() => {
-                    const tempVariations = [...variations];
-                    tempVariations.splice(variationIdx, 1);
-                    setVariations(tempVariations);
-                  }}
-                />
+              <IconButton
+                Icon={TrashIcon}
+                theme="error"
+                // onClick={() => {
+                //   const tempVariations = [...variations];
+                //   tempVariations.splice(variationIdx, 1);
+                //   setVariations(tempVariations);
+                // }}
+              />
 
-                {/* Variation sleeve dropdown */}
+              {/* Variation sleeve dropdown */}
 
-                <div className="flex-1">
-                  <SelectBox
-                    list={sleeves}
-                    placeholder="Select Sleeve"
-                    // value={variation.sleeve}
-                    // onChanged={(value) => {
-                    //   const tempVariations = [...variations];
-                    //   tempVariations[variationIdx].sleeve = value;
-                    //   setVariations(tempVariations);
-                    // }}
-                    value={null}
-                    onChanged={() => {}}
-                  />
-                </div>
-
-                {/* Variation collar dropdown */}
-
-                <div className="flex-1">
-                  <SelectBox
-                    list={collars}
-                    placeholder="Select Collar"
-                    // value={variation.collar}
-                    // onChanged={(value) => {
-                    //   const tempVariations = [...variations];
-                    //   tempVariations[variationIdx].collar = value;
-                    //   setVariations(tempVariations);
-                    // }}
-                    value={null}
-                    onChanged={() => {}}
-                  />
-                </div>
-
-                {/* Variation color picker */}
-
-                <label className="relative block w-[104px] h-13 rounded-lg overflow-hidden">
-                  <input
-                    type="color"
-                    className="w-full h-full absolute inset-0"
-                    value={variation.color}
-                    onChange={(e) => {
-                      const tempVariations = [...variations];
-                      tempVariations[variationIdx].color = e.target.value;
-                      setVariations(tempVariations);
-                    }}
-                  />
-                  <div
-                    className={"absolute inset-0"}
-                    style={{ backgroundColor: variation.color }}
-                  ></div>
-                </label>
-              </div>
-
-              {variation.sizes.map((size, sizeIdx) => {
-                return (
-                  <div key={sizeIdx}>
-                    {/* Variation size title */}
-
-                    <div className="text-base leading-tight mb-6">
-                      {size.size.toUpperCase()} SIZE | {size.prints.length}{" "}
-                      TOTAL
-                    </div>
-
-                    {size.prints.map((print, printIdx) => {
-                      return (
-                        <div key={printIdx} className="flex space-x-4 mb-4">
-                          {/* Variation size print remove button */}
-
-                          <IconButton
-                            Icon={MinusIcon}
-                            theme="error-light"
-                            onClick={() => {
-                              const tempVariations = [...variations];
-
-                              // Remove size if the last print is removed,
-                              // Otherwise just remove the selected print.
-                              if (size.prints.length <= 1) {
-                                const tempSizes = [...variation.sizes];
-                                tempSizes.splice(sizeIdx, 1);
-                                tempVariations[variationIdx].sizes = tempSizes;
-                                setVariations(tempVariations);
-                              } else {
-                                const tempPrints = [...size.prints];
-                                tempPrints.splice(printIdx, 1);
-                                tempVariations[variationIdx].sizes[
-                                  sizeIdx
-                                ].prints = tempPrints;
-                                setVariations(tempVariations);
-                              }
-                            }}
-                          />
-
-                          {/* Variation size print name field */}
-
-                          <div className="flex-1">
-                            <TextField
-                              placeholder="Name (Optional)"
-                              value={print.name}
-                              onChanged={(value) => {
-                                const tempVariations = [...variations];
-                                tempVariations[variationIdx].sizes[
-                                  sizeIdx
-                                ].prints[printIdx].name = value;
-                                setVariations(tempVariations);
-                              }}
-                            />
-                          </div>
-
-                          {/* Variation size print number field */}
-
-                          <div className="flex-1">
-                            <TextField
-                              placeholder="Number (Optional)"
-                              value={print.number}
-                              onChanged={(value) => {
-                                const tempVariations = [...variations];
-                                tempVariations[variationIdx].sizes[
-                                  sizeIdx
-                                ].prints[printIdx].number = value;
-                                setVariations(tempVariations);
-                              }}
-                            />
-                          </div>
-
-                          {/* Variation size print quantity field */}
-
-                          <div className="w-[104px]">
-                            <TextField
-                              placeholder="1"
-                              value={print.quantity}
-                              onChanged={(value) => {
-                                const tempVariations = [...variations];
-                                tempVariations[variationIdx].sizes[
-                                  sizeIdx
-                                ].prints[printIdx].quantity = value;
-                                setVariations(tempVariations);
-                              }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    {/* Variation size print add button */}
-
-                    <div className=" mb-6">
-                      <IconButton
-                        Icon={PlusIcon}
-                        theme="light"
-                        onClick={() => {
-                          const tempVariations = [...variations];
-                          tempVariations[variationIdx].sizes[
-                            sizeIdx
-                          ].prints.push({ name: "", number: "", quantity: "" });
-                          setVariations(tempVariations);
-                        }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-
-              <div className="flex-1 mb-12">
-                <TextButton
-                  theme="light"
-                  text="Add Size"
-                  onClicked={() => openModal()}
+              <div className="flex-1">
+                <SelectBox
+                  placeholder="Select Sleeve"
+                  list={sleeves}
+                  value={getVariationReferenceId(vId, "sleeve")}
+                  onChanged={(key) =>
+                    updateVariationDetail(vId, "sleeve", {
+                      [key]: sleeves[key],
+                    })
+                  }
+                  // value={variation.sleeve}
+                  // onChanged={(value) => {
+                  //   const tempVariations = [...variations];
+                  //   tempVariations[variationIdx].sleeve = value;
+                  //   setVariations(tempVariations);
+                  // }}
                 />
               </div>
 
-              {/* <Modal
+              {/* Variation collar dropdown */}
+
+              <div className="flex-1">
+                <SelectBox
+                  placeholder="Select Collar"
+                  list={collars}
+                  value={getVariationReferenceId(vId, "collar")}
+                  onChanged={(key) =>
+                    updateVariationDetail(vId, "collar", {
+                      [key]: collars[key],
+                    })
+                  }
+                  // value={variation.collar}
+                  // onChanged={(value) => {
+                  //   const tempVariations = [...variations];
+                  //   tempVariations[variationIdx].collar = value;
+                  //   setVariations(tempVariations);
+                  // }}
+                />
+              </div>
+
+              {/* Variation color picker */}
+
+              <label className="relative block w-[104px] h-13 rounded-lg overflow-hidden">
+                <input
+                  type="color"
+                  className="w-full h-full absolute inset-0"
+                  // value={variation.color}
+                  // onChange={(e) => {
+                  //   const tempVariations = [...variations];
+                  //   tempVariations[variationIdx].color = e.target.value;
+                  //   setVariations(tempVariations);
+                  // }}
+                />
+                <div
+                  className={"absolute inset-0"}
+                  // style={{ backgroundColor: variation.color }}
+                ></div>
+              </label>
+            </div>
+
+            {Object.keys(getVariationDetail(vId, "sizes")).map((sId, sIdx) => {
+              // return (
+              //   <div key={sIdx}>
+              //     {/* Variation size title */}
+              //     <div className="text-base leading-tight mb-6">
+              //       {sId.size.toUpperCase()} SIZE | {sId.prints.length}{" "}
+              //       TOTAL
+              //     </div>
+              //     {sId.prints.map((print, printIdx) => {
+              //       return (
+              //         <div key={printIdx} className="flex space-x-4 mb-4">
+              //           {/* Variation size print remove button */}
+              //           <IconButton
+              //             Icon={MinusIcon}
+              //             theme="error-light"
+              //             // onClick={() => {
+              //             //   const tempVariations = [...variations];
+              //             //   // Remove size if the last print is removed,
+              //             //   // Otherwise just remove the selected print.
+              //             //   if (size.prints.length <= 1) {
+              //             //     const tempSizes = [...variation.sizes];
+              //             //     tempSizes.splice(sizeIdx, 1);
+              //             //     tempVariations[variationIdx].sizes = tempSizes;
+              //             //     setVariations(tempVariations);
+              //             //   } else {
+              //             //     const tempPrints = [...size.prints];
+              //             //     tempPrints.splice(printIdx, 1);
+              //             //     tempVariations[variationIdx].sizes[
+              //             //       sizeIdx
+              //             //     ].prints = tempPrints;
+              //             //     setVariations(tempVariations);
+              //             //   }
+              //             // }}
+              //           />
+              //           {/* Variation size print name field */}
+              //           <div className="flex-1">
+              //             <TextField
+              //               placeholder="Name (Optional)"
+              //               // value={print.name}
+              //               // onChanged={(value) => {
+              //               //   const tempVariations = [...variations];
+              //               //   tempVariations[variationIdx].sizes[
+              //               //     sizeIdx
+              //               //   ].prints[printIdx].name = value;
+              //               //   setVariations(tempVariations);
+              //               // }}
+              //             />
+              //           </div>
+              //           {/* Variation size print number field */}
+              //           <div className="flex-1">
+              //             <TextField
+              //               placeholder="Number (Optional)"
+              //               // value={print.number}
+              //               // onChanged={(value) => {
+              //               //   const tempVariations = [...variations];
+              //               //   tempVariations[variationIdx].sizes[
+              //               //     sizeIdx
+              //               //   ].prints[printIdx].number = value;
+              //               //   setVariations(tempVariations);
+              //               // }}
+              //             />
+              //           </div>
+              //           {/* Variation size print quantity field */}
+              //           <div className="w-[104px]">
+              //             <TextField
+              //               placeholder="1"
+              //               // value={print.quantity}
+              //               // onChanged={(value) => {
+              //               //   const tempVariations = [...variations];
+              //               //   tempVariations[variationIdx].sizes[
+              //               //     sizeIdx
+              //               //   ].prints[printIdx].quantity = value;
+              //               //   setVariations(tempVariations);
+              //               // }}
+              //             />
+              //           </div>
+              //         </div>
+              //       );
+              //     })}
+              //     {/* Variation size print add button */}
+              //     <div className=" mb-6">
+              //       <IconButton
+              //         Icon={PlusIcon}
+              //         theme="light"
+              //         // onClick={() => {
+              //         //   const tempVariations = [...variations];
+              //         //   tempVariations[variationIdx].sizes[
+              //         //     sizeIdx
+              //         //   ].prints.push({ name: "", number: "", quantity: "" });
+              //         //   setVariations(tempVariations);
+              //         // }}
+              //       />
+              //     </div>
+              //   </div>
+              // );
+            })}
+
+            <div className="flex-1 mb-12">
+              <TextButton
+                theme="light"
+                text="Add Size"
+                onClicked={() => openModal()}
+              />
+            </div>
+
+            {/* <Modal
                 isOpen={modalIsOpen}
                 onAfterOpen={afterOpenModal}
                 onRequestClose={closeModal}
@@ -439,9 +451,8 @@ const Form = ({ firebase }) => {
                   ))}
                 </div>
               </Modal> */}
-            </div>
-          );
-        })}
+          </div>
+        ))}
 
         {/* Add Variation */}
 
@@ -449,16 +460,16 @@ const Form = ({ firebase }) => {
           <TextButton
             theme="light"
             text="Add New Variation"
-            onClicked={() => {
-              const tempVariations = [...variations];
-              tempVariations.push({
-                sleeve: sleeves[0],
-                collar: collars[0],
-                color: "#101010",
-                sizes: [],
-              });
-              setVariations(tempVariations);
-            }}
+            // onClicked={() => {
+            //   const tempVariations = [...variations];
+            //   tempVariations.push({
+            //     sleeve: sleeves[0],
+            //     collar: collars[0],
+            //     color: "#101010",
+            //     sizes: [],
+            //   });
+            //   setVariations(tempVariations);
+            // }}
           />
         </div>
 
