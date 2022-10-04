@@ -9,10 +9,11 @@ import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
 } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NumberButton from "../../components/NumberButton";
 import { useHistory } from "react-router-dom";
 import { withFirebase } from "../../services/Firebase";
+import moment from "moment";
 
 const Home = ({ firebase }) => {
   const onMenuClicked = () => firebase.logout();
@@ -21,7 +22,38 @@ const Home = ({ firebase }) => {
   };
 
   const [query, setQuery] = useState("");
+  const [summaries, setSummaries] = useState({});
+  const [status, setStatus] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
+
+  useEffect(() => {
+    getInitialData();
+  }, []);
+
+  useEffect(() => {
+    console.log(summaries);
+  }, [summaries]);
+
+  const getInitialData = async () => {
+    const summaries = await firebase.getSummaries();
+    setSummaries(summaries);
+
+    const status = await firebase.getChoices("status");
+    setStatus(status);
+
+    console.log(await firebase.getOrder("6zVCmgE12IzraoOMXCZj"));
+
+    setIsLoading(false);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -68,14 +100,15 @@ const Home = ({ firebase }) => {
           {/* Table Rows */}
 
           <div className="space-y-4">
-            <TableRow />
-            <TableRow />
-            <TableRow />
-            <TableRow />
-            <TableRow />
-            <TableRow />
-            <TableRow />
-            <TableRow />
+            {Object.keys(summaries).map((key) => {
+              return (
+                <TableRow
+                  key={summaries[key].id}
+                  order={summaries[key]}
+                  status={status}
+                />
+              );
+            })}
           </div>
         </div>
 

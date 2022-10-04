@@ -8,7 +8,14 @@ import {
   updateProfile,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import {
+  doc,
+  getFirestore,
+  collection,
+  getDocs,
+  getDoc,
+  Timestamp,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD34KJ19zqZs5nhhTydo_JP3XIrcS9Uuxc",
@@ -80,9 +87,73 @@ class Firebase {
     return errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1);
   }
 
-  //   serverTimeStamp() {
-  //     return app.firestore.FieldValue.serverTimestamp();
-  //   }
+  // Get a list of all sleeve choices.
+  async getChoices(choice) {
+    const choiceDocs = (await getDocs(collection(this.db, choice))).docs;
+    const choices = {};
+    for (const choiceDoc of choiceDocs) {
+      choices[choiceDoc.id] = { name: choiceDoc.data().name || null };
+    }
+    return choices;
+  }
+
+  // Get order summaries to populate home page.
+  async getSummaries() {
+    const orderDocs = (await getDocs(collection(this.db, "orders"))).docs;
+    const summaries = {};
+    for (const orderDoc of orderDocs) {
+      summaries[orderDoc.id] = {
+        customer: await this.getOrderNestedValue(orderDoc, "customerRef"),
+        date: this.getOrderDate(orderDoc),
+        id: this.getOrderSingleValue(orderDoc, "id"),
+        status: await this.getOrderNestedValue(orderDoc, "statusRef"),
+      };
+    }
+    return summaries;
+  }
+
+  // Get a single full order details.
+  async getOrder(orderId) {
+    const orderDoc = await getDoc(doc(this.db, "orders", orderId));
+    return {
+      [orderDoc.id]: {
+        customer: await this.getOrderNestedValue(orderDoc, "customerRef"),
+        date: this.getOrderDate(orderDoc),
+        design: this.getOrderSingleValue(orderDoc, "design"),
+        designer: await this.getOrderNestedValue(orderDoc, "designerRef"),
+        id: this.getOrderSingleValue(orderDoc, "id"),
+        material: await this.getOrderNestedValue(orderDoc, "materialRef"),
+        remark: this.getOrderSingleValue(orderDoc, "remark"),
+        status: await this.getOrderNestedValue(orderDoc, "statusRef"),
+      },
+    };
+  }
+
+  // Get designer from order document.
+  // Returns null if designer document doesn't exist.
+  async getOrderNestedValue(orderDoc, key) {
+    if (!orderDoc.data()[key]) return null;
+    const nestedDoc = await getDoc(orderDoc.data()[key]);
+    if (!nestedDoc.exists) return null;
+    return { [nestedDoc.id]: { name: nestedDoc.data().name || null } };
+  }
+
+  // Get creation date from order document.
+  // Returns null if creation date doesn't exist.
+  getOrderDate(orderDoc) {
+    const date = this.getOrderSingleValue(orderDoc, "date");
+    return date ? new Date(date.seconds * 1000) : null;
+  }
+
+  // Get an order property from order document.
+  // Returns null if order property doesn't exist.
+  getOrderSingleValue(orderDoc, key) {
+    return orderDoc.data()[key] || null;
+  }
+
+  // serverTimeStamp() {
+  //   return app.firestore.FieldValue.serverTimestamp();
+  // }
 }
 
 export default Firebase;

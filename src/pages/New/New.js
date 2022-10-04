@@ -12,8 +12,9 @@ import DatePicker from "../../components/DatePicker";
 import SelectBox from "../../components/SelectBox";
 import IconButton from "../../components/IconButton";
 import TextButton from "../../components/TextButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "react-modal";
+import { withFirebase } from "../../services/Firebase";
 
 const sizes = [
   { id: 1, name: "XS" },
@@ -36,15 +37,15 @@ const customers = [
 
 const materials = [[1, "Cotton"]];
 
-const statuses = [
-  { id: 1, name: "In Progress" },
-  { id: 2, name: "Completed" },
-];
+// const statuses = [
+//   { id: 1, name: "In Progress" },
+//   { id: 2, name: "Completed" },
+// ];
 
-const sleeves = [
-  { id: 1, name: "Short Sleeve" },
-  { id: 2, name: "Long Sleeve" },
-];
+// const sleeves = [
+//   { id: 1, name: "Short Sleeve" },
+//   { id: 2, name: "Long Sleeve" },
+// ];
 
 const collars = [
   { id: 1, name: "Round Neck" },
@@ -73,17 +74,38 @@ const initialVariations = [
   },
 ];
 
-export default () => {
+const New = ({ firebase }) => {
   const [design, setDesign] = useState("");
   const [customer, setCustomer] = useState(null);
   const [designer, setDesigner] = useState(null);
   const [material, setMaterial] = useState(null);
   const [date, setDate] = useState(new Date());
-  const [status, setStatus] = useState(statuses[0]);
   const [remark, setRemark] = useState("");
   const [variations, setVariations] = useState(initialVariations);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [size, setSize] = useState(sizes[0]);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = useState({});
+  const [sleeves, setSleeves] = useState({});
+  const [collars, setCollars] = useState({});
+
+  useEffect(() => {
+    getInitialData();
+  }, []);
+
+  const getInitialData = async () => {
+    const status = await firebase.getChoices("status");
+    setStatus(status);
+
+    const sleeves = await firebase.getChoices("sleeves");
+    setSleeves(sleeves);
+
+    const collars = await firebase.getChoices("collars");
+    setCollars(collars);
+
+    setIsLoading(false);
+  };
 
   const customStyles = {
     content: {
@@ -98,6 +120,14 @@ export default () => {
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
   const afterOpenModal = () => setSize(sizes[0]);
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -144,7 +174,7 @@ export default () => {
               onChanged={setMaterial}
             />
             <DatePicker value={date} onChanged={setDate} />
-            <SelectBox list={statuses} value={status} onChanged={setStatus} />
+            <SelectBox list={status} value={null} onChanged={() => {}} />
           </div>
 
           {/* Details 2nd Column (Image and Remarks) */}
@@ -193,12 +223,14 @@ export default () => {
                   <SelectBox
                     list={sleeves}
                     placeholder="Select Sleeve"
-                    value={variation.sleeve}
-                    onChanged={(value) => {
-                      const tempVariations = [...variations];
-                      tempVariations[variationIdx].sleeve = value;
-                      setVariations(tempVariations);
-                    }}
+                    // value={variation.sleeve}
+                    // onChanged={(value) => {
+                    //   const tempVariations = [...variations];
+                    //   tempVariations[variationIdx].sleeve = value;
+                    //   setVariations(tempVariations);
+                    // }}
+                    value={null}
+                    onChanged={() => {}}
                   />
                 </div>
 
@@ -208,12 +240,14 @@ export default () => {
                   <SelectBox
                     list={collars}
                     placeholder="Select Collar"
-                    value={variation.collar}
-                    onChanged={(value) => {
-                      const tempVariations = [...variations];
-                      tempVariations[variationIdx].collar = value;
-                      setVariations(tempVariations);
-                    }}
+                    // value={variation.collar}
+                    // onChanged={(value) => {
+                    //   const tempVariations = [...variations];
+                    //   tempVariations[variationIdx].collar = value;
+                    //   setVariations(tempVariations);
+                    // }}
+                    value={null}
+                    onChanged={() => {}}
                   />
                 </div>
 
@@ -426,3 +460,5 @@ export default () => {
     </div>
   );
 };
+
+export default withFirebase(New);

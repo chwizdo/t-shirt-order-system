@@ -1,11 +1,11 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/solid";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 export default ({
-  list = [],
-  value = null,
-  onChanged = () => {},
+  list = { 1: { name: "Dog" }, 2: { name: "Cat" } },
+  value = 1,
+  onChanged = (id) => {},
   placeholder = "Placeholder",
 }) => {
   return (
@@ -18,7 +18,7 @@ export default ({
                 value ? "text-black" : "text-light-grey"
               }`}
             >
-              {value ? value.name : placeholder}
+              {value ? list[value].name : placeholder}
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-6">
               <ChevronDownIcon
@@ -34,17 +34,17 @@ export default ({
             leaveTo="opacity-0"
           >
             <Listbox.Options className="absolute mt-4 max-h-60 w-full overflow-auto rounded-lg bg-white text-base border-2 border-black outline-none z-50">
-              {list.map((item) => (
+              {Object.keys(list).map((key) => (
                 <Listbox.Option
-                  key={item.id}
+                  key={key}
                   className={({ active }) =>
                     `relative cursor-default select-none h-13 px-6 flex items-center outline-none ${
                       active ? "bg-black text-white" : "text-black"
                     }`
                   }
-                  value={item}
+                  value={key}
                 >
-                  <div className="truncate">{item.name}</div>
+                  <div className="truncate">{list[key].name}</div>
                 </Listbox.Option>
               ))}
             </Listbox.Options>

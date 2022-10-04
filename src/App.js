@@ -22,7 +22,11 @@ const App = ({ firebase }) => {
     });
   }, []);
 
-  if (isAuthenticated === null) return <div>Loading</div>;
+  if (isAuthenticated === null) {
+    return (
+      <div className="h-screen flex justify-center items-center">Loading</div>
+    );
+  }
 
   return (
     <Router>
