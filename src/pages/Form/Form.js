@@ -15,50 +15,10 @@ import TextButton from "../../components/TextButton";
 import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { withFirebase } from "../../services/Firebase";
-
-const sizes = [
-  { id: 1, name: "XS" },
-  { id: 2, name: "S" },
-  { id: 3, name: "M" },
-  { id: 4, name: "L" },
-  { id: 5, name: "XL" },
-  { id: 6, name: "2XL" },
-  { id: 7, name: "3XL" },
-];
-
-const materials = [[1, "Cotton"]];
-
-const initialVariations = [
-  {
-    sleeve: { id: 1, name: "Short Sleeve" },
-    collar: { id: 1, name: "Round Neck" },
-    color: "#00FF00",
-    sizes: [
-      {
-        size: "s",
-        prints: [
-          { name: "John", number: "21", quantity: 1 },
-          { name: "May", number: "07", quantity: 1 },
-          { name: "Julia", number: "14", quantity: 1 },
-        ],
-      },
-      {
-        size: "m",
-        prints: [{ name: "Amanda", number: "08", quantity: 1 }],
-      },
-    ],
-  },
-];
+import { collection, doc } from "firebase/firestore";
 
 const Form = ({ firebase }) => {
-  const [design, setDesign] = useState("");
-  const [designer, setDesigner] = useState(null);
-  const [material, setMaterial] = useState(null);
-  const [date, setDate] = useState(new Date());
-  const [remark, setRemark] = useState("");
-  const [variations, setVariations] = useState(initialVariations);
   const [modalIsOpen, setIsOpen] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
   const [customers, setCustomers] = useState({});
   const [sizes, setSizes] = useState({});
@@ -124,6 +84,129 @@ const Form = ({ firebase }) => {
     tempOrder[orderId].variations[variationId][key] = value;
     setOrder(tempOrder);
   };
+
+  const removeVariation = (variationId) => {
+    const tempOrder = { ...order };
+    delete tempOrder[orderId].variations[variationId];
+    setOrder(tempOrder);
+  };
+
+  const getSizeDetail = (variationId, sizeId, key) => {
+    const tempOrder = { ...order };
+    return tempOrder[orderId].variations[variationId].sizes[sizeId][key];
+  };
+
+  const getSizeReferenceDetail = (variationId, sizeId, key) => {
+    const reference = getSizeDetail(variationId, sizeId, key);
+    if (!reference) return reference;
+    return Object.values(reference)[0];
+  };
+
+  const getPrintDetail = (variationId, sizeId, printId, key) => {
+    const tempOrder = { ...order };
+    return tempOrder[orderId].variations[variationId].sizes[sizeId].prints[
+      printId
+    ][key];
+  };
+
+  const updatePrintDetail = (variationId, sizeId, printId, key, value) => {
+    const tempOrder = { ...order };
+    tempOrder[orderId].variations[variationId].sizes[sizeId].prints[printId][
+      key
+    ] = value;
+    setOrder(tempOrder);
+  };
+
+  const removePrintDetail = (variationId, sizeId, printId) => {
+    const tempOrder = { ...order };
+    if (Object.keys(getSizeDetail(variationId, sizeId, "prints")).length <= 1) {
+      delete tempOrder[orderId].variations[variationId].sizes[sizeId];
+    } else {
+      delete tempOrder[orderId].variations[variationId].sizes[sizeId].prints[
+        printId
+      ];
+    }
+    setOrder(tempOrder);
+  };
+
+  const addVariation = () => {
+    const variationId = generateVariationId();
+    const sizeId = generateSizeId(variationId);
+    const printId = generatePrintId(variationId, sizeId);
+    const tempOrder = { ...order };
+    tempOrder[orderId].variations[variationId] = createEmptyVariation(
+      sizeId,
+      printId,
+      Object.keys(sizes)[0]
+    );
+    setOrder(tempOrder);
+  };
+
+  const addSize = (variationId, selectedSizeId) => {
+    const sizeId = generateSizeId(variationId);
+    const printId = generatePrintId(variationId, sizeId);
+    const tempOrder = { ...order };
+    tempOrder[orderId].variations[variationId].sizes[sizeId] = createEmptySize(
+      printId,
+      selectedSizeId
+    );
+    setOrder(tempOrder);
+  };
+
+  const addPrint = (variationId, sizeId) => {
+    const printId = generatePrintId(variationId, sizeId);
+    const tempOrder = { ...order };
+    tempOrder[orderId].variations[variationId].sizes[sizeId].prints[printId] =
+      createEmptyPrint();
+    setOrder(tempOrder);
+  };
+
+  const generateVariationId = () =>
+    doc(collection(firebase.db, "orders", orderId, "variations")).id;
+
+  const generateSizeId = (variationId) =>
+    doc(
+      collection(
+        firebase.db,
+        "orders",
+        orderId,
+        "variations",
+        variationId,
+        "sizes"
+      )
+    ).id;
+
+  const generatePrintId = (variationId, sizeId) =>
+    doc(
+      collection(
+        firebase.db,
+        "orders",
+        orderId,
+        "variations",
+        variationId,
+        "sizes",
+        sizeId,
+        "prints"
+      )
+    ).id;
+
+  const createEmptyPrint = () => ({
+    name: "",
+    number: "",
+    quantity: "",
+  });
+
+  const createEmptySize = (printId, sizeId) => ({
+    size: { [sizeId]: sizes[sizeId] },
+    prints: { [printId]: createEmptyPrint() },
+  });
+
+  const createEmptyVariation = (sizeId, printId, selectedSizeId) => ({
+    collar: { [Object.keys(collars)[0]]: Object.values(collars)[0] },
+    color: "#FF0000",
+    sleeve: { [Object.keys(sleeves)[0]]: Object.values(sleeves)[0] },
+    sizes: { [sizeId]: createEmptySize(printId, selectedSizeId) },
+  });
 
   const customStyles = {
     content: {
@@ -242,11 +325,7 @@ const Form = ({ firebase }) => {
               <IconButton
                 Icon={TrashIcon}
                 theme="error"
-                // onClick={() => {
-                //   const tempVariations = [...variations];
-                //   tempVariations.splice(variationIdx, 1);
-                //   setVariations(tempVariations);
-                // }}
+                onClick={() => removeVariation(vId)}
               />
 
               {/* Variation sleeve dropdown */}
@@ -261,12 +340,6 @@ const Form = ({ firebase }) => {
                       [key]: sleeves[key],
                     })
                   }
-                  // value={variation.sleeve}
-                  // onChanged={(value) => {
-                  //   const tempVariations = [...variations];
-                  //   tempVariations[variationIdx].sleeve = value;
-                  //   setVariations(tempVariations);
-                  // }}
                 />
               </div>
 
@@ -282,12 +355,6 @@ const Form = ({ firebase }) => {
                       [key]: collars[key],
                     })
                   }
-                  // value={variation.collar}
-                  // onChanged={(value) => {
-                  //   const tempVariations = [...variations];
-                  //   tempVariations[variationIdx].collar = value;
-                  //   setVariations(tempVariations);
-                  // }}
                 />
               </div>
 
@@ -297,115 +364,93 @@ const Form = ({ firebase }) => {
                 <input
                   type="color"
                   className="w-full h-full absolute inset-0"
-                  // value={variation.color}
-                  // onChange={(e) => {
-                  //   const tempVariations = [...variations];
-                  //   tempVariations[variationIdx].color = e.target.value;
-                  //   setVariations(tempVariations);
-                  // }}
+                  value={getVariationDetail(vId, "color")}
+                  onChange={(e) =>
+                    updateVariationDetail(vId, "color", e.target.value)
+                  }
                 />
                 <div
                   className={"absolute inset-0"}
-                  // style={{ backgroundColor: variation.color }}
+                  style={{ backgroundColor: getVariationDetail(vId, "color") }}
                 ></div>
               </label>
             </div>
 
             {Object.keys(getVariationDetail(vId, "sizes")).map((sId, sIdx) => {
-              // return (
-              //   <div key={sIdx}>
-              //     {/* Variation size title */}
-              //     <div className="text-base leading-tight mb-6">
-              //       {sId.size.toUpperCase()} SIZE | {sId.prints.length}{" "}
-              //       TOTAL
-              //     </div>
-              //     {sId.prints.map((print, printIdx) => {
-              //       return (
-              //         <div key={printIdx} className="flex space-x-4 mb-4">
-              //           {/* Variation size print remove button */}
-              //           <IconButton
-              //             Icon={MinusIcon}
-              //             theme="error-light"
-              //             // onClick={() => {
-              //             //   const tempVariations = [...variations];
-              //             //   // Remove size if the last print is removed,
-              //             //   // Otherwise just remove the selected print.
-              //             //   if (size.prints.length <= 1) {
-              //             //     const tempSizes = [...variation.sizes];
-              //             //     tempSizes.splice(sizeIdx, 1);
-              //             //     tempVariations[variationIdx].sizes = tempSizes;
-              //             //     setVariations(tempVariations);
-              //             //   } else {
-              //             //     const tempPrints = [...size.prints];
-              //             //     tempPrints.splice(printIdx, 1);
-              //             //     tempVariations[variationIdx].sizes[
-              //             //       sizeIdx
-              //             //     ].prints = tempPrints;
-              //             //     setVariations(tempVariations);
-              //             //   }
-              //             // }}
-              //           />
-              //           {/* Variation size print name field */}
-              //           <div className="flex-1">
-              //             <TextField
-              //               placeholder="Name (Optional)"
-              //               // value={print.name}
-              //               // onChanged={(value) => {
-              //               //   const tempVariations = [...variations];
-              //               //   tempVariations[variationIdx].sizes[
-              //               //     sizeIdx
-              //               //   ].prints[printIdx].name = value;
-              //               //   setVariations(tempVariations);
-              //               // }}
-              //             />
-              //           </div>
-              //           {/* Variation size print number field */}
-              //           <div className="flex-1">
-              //             <TextField
-              //               placeholder="Number (Optional)"
-              //               // value={print.number}
-              //               // onChanged={(value) => {
-              //               //   const tempVariations = [...variations];
-              //               //   tempVariations[variationIdx].sizes[
-              //               //     sizeIdx
-              //               //   ].prints[printIdx].number = value;
-              //               //   setVariations(tempVariations);
-              //               // }}
-              //             />
-              //           </div>
-              //           {/* Variation size print quantity field */}
-              //           <div className="w-[104px]">
-              //             <TextField
-              //               placeholder="1"
-              //               // value={print.quantity}
-              //               // onChanged={(value) => {
-              //               //   const tempVariations = [...variations];
-              //               //   tempVariations[variationIdx].sizes[
-              //               //     sizeIdx
-              //               //   ].prints[printIdx].quantity = value;
-              //               //   setVariations(tempVariations);
-              //               // }}
-              //             />
-              //           </div>
-              //         </div>
-              //       );
-              //     })}
-              //     {/* Variation size print add button */}
-              //     <div className=" mb-6">
-              //       <IconButton
-              //         Icon={PlusIcon}
-              //         theme="light"
-              //         // onClick={() => {
-              //         //   const tempVariations = [...variations];
-              //         //   tempVariations[variationIdx].sizes[
-              //         //     sizeIdx
-              //         //   ].prints.push({ name: "", number: "", quantity: "" });
-              //         //   setVariations(tempVariations);
-              //         // }}
-              //       />
-              //     </div>
-              //   </div>
-              // );
+              return (
+                <div key={sIdx}>
+                  {/* Variation size title */}
+                  <div className="text-base leading-tight mb-6">
+                    {`${getSizeReferenceDetail(vId, sId, "size").name} SIZE | ${
+                      Object.keys(getSizeDetail(vId, sId, "size")).length
+                    } TOTAL`}
+                  </div>
+                  {Object.keys(getSizeDetail(vId, sId, "prints")).map(
+                    (pId, pIdx) => {
+                      return (
+                        <div key={pId} className="flex space-x-4 mb-4">
+                          {/* Variation size print remove button */}
+                          <IconButton
+                            Icon={MinusIcon}
+                            theme="error-light"
+                            onClick={() => removePrintDetail(vId, sId, pId)}
+                          />
+                          {/* Variation size print name field */}
+                          <div className="flex-1">
+                            <TextField
+                              placeholder="Name (Optional)"
+                              value={getPrintDetail(vId, sId, pId, "name")}
+                              onChanged={(value) =>
+                                updatePrintDetail(vId, sId, pId, "name", value)
+                              }
+                            />
+                          </div>
+                          {/* Variation size print number field */}
+                          <div className="flex-1">
+                            <TextField
+                              placeholder="Number (Optional)"
+                              value={getPrintDetail(vId, sId, pId, "number")}
+                              onChanged={(value) =>
+                                updatePrintDetail(
+                                  vId,
+                                  sId,
+                                  pId,
+                                  "number",
+                                  value
+                                )
+                              }
+                            />
+                          </div>
+                          {/* Variation size print quantity field */}
+                          <div className="w-[104px]">
+                            <TextField
+                              placeholder="1"
+                              value={getPrintDetail(vId, sId, pId, "quantity")}
+                              onChanged={(value) =>
+                                updatePrintDetail(
+                                  vId,
+                                  sId,
+                                  pId,
+                                  "quantity",
+                                  value
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                      );
+                    }
+                  )}
+                  {/* Variation size print add button */}
+                  <div className=" mb-6">
+                    <IconButton
+                      Icon={PlusIcon}
+                      theme="light"
+                      onClick={() => addPrint(vId, sId)}
+                    />
+                  </div>
+                </div>
+              );
             })}
 
             <div className="flex-1 mb-12">
@@ -416,41 +461,36 @@ const Form = ({ firebase }) => {
               />
             </div>
 
-            {/* <Modal
-                isOpen={modalIsOpen}
-                onAfterOpen={afterOpenModal}
-                onRequestClose={closeModal}
-                style={customStyles}
-                contentLabel="Example Modal"
-                ariaHideApp={false}
-              >
-                <div className="mb-4">
-                  <span
-                    className="leading-tight underline text-black cursor-pointer"
-                    onClick={closeModal}
-                  >
-                    Close
-                  </span>
-                </div>
-                <div className="space-y-4">
-                  {Object.keys(sizes).map((key) => (
-                    <TextButton
-                      key={key}
-                      theme="light"
-                      text={sizes[key].name}
-                      onClicked={() => {
-                        const tempVariations = [...variations];
-                        tempVariations[variationIdx].sizes.push({
-                          size: size.name,
-                          prints: [{ name: "", number: "", quantity: 1 }],
-                        });
-                        setVariations(tempVariations);
-                        closeModal();
-                      }}
-                    />
-                  ))}
-                </div>
-              </Modal> */}
+            <Modal
+              isOpen={modalIsOpen}
+              onAfterOpen={afterOpenModal}
+              onRequestClose={closeModal}
+              style={customStyles}
+              contentLabel="Example Modal"
+              ariaHideApp={false}
+            >
+              <div className="mb-4">
+                <span
+                  className="leading-tight underline text-black cursor-pointer"
+                  onClick={closeModal}
+                >
+                  Close
+                </span>
+              </div>
+              <div className="space-y-4">
+                {Object.keys(sizes).map((sId) => (
+                  <TextButton
+                    key={sId}
+                    theme="light"
+                    text={sizes[sId].name}
+                    onClicked={() => {
+                      addSize(vId, sId);
+                      setIsOpen(false);
+                    }}
+                  />
+                ))}
+              </div>
+            </Modal>
           </div>
         ))}
 
@@ -460,16 +500,7 @@ const Form = ({ firebase }) => {
           <TextButton
             theme="light"
             text="Add New Variation"
-            // onClicked={() => {
-            //   const tempVariations = [...variations];
-            //   tempVariations.push({
-            //     sleeve: sleeves[0],
-            //     collar: collars[0],
-            //     color: "#101010",
-            //     sizes: [],
-            //   });
-            //   setVariations(tempVariations);
-            // }}
+            onClicked={() => addVariation()}
           />
         </div>
 

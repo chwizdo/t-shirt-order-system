@@ -38,7 +38,7 @@ export default ({
           <div className="relative">
             <Combobox.Input
               className="w-full border-2 border-grey h-13 pl-6 pr-14 rounded-lg leading-tight text-black outline-none focus:border-black transition"
-              displayValue={(key) => list[key].name}
+              displayValue={(key) => key && list[key].name}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={placeholder}
             />
@@ -62,23 +62,19 @@ export default ({
                   Nothing found.
                 </div>
               ) : (
-                Object.keys(filtered).map((key) => {
-                  console.log(filtered);
-                  console.log(key);
-                  return (
-                    <Combobox.Option
-                      key={key}
-                      className={({ active }) =>
-                        `cursor-default select-none h-13 px-6 flex items-center inset-0 w-full border-none ${
-                          active ? "bg-black text-white" : "text-black"
-                        }`
-                      }
-                      value={key}
-                    >
-                      <div className="truncate">{filtered[key].name}</div>
-                    </Combobox.Option>
-                  );
-                })
+                Object.keys(filtered).map((key) => (
+                  <Combobox.Option
+                    key={key}
+                    className={({ active }) =>
+                      `cursor-default select-none h-13 px-6 flex items-center inset-0 w-full border-none ${
+                        active ? "bg-black text-white" : "text-black"
+                      }`
+                    }
+                    value={key}
+                  >
+                    <div className="truncate">{filtered[key].name}</div>
+                  </Combobox.Option>
+                ))
               )}
             </Combobox.Options>
           </Transition>
