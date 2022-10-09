@@ -22,10 +22,10 @@ export default ({ selections, getOrderDetail, updateOrderDetail }) => {
         />
         <ComboBox
           placeholder="Select Designer"
-          list={selections.customers}
-          value={Object.keys(getOrderDetail("customer"))[0]}
+          list={selections.designers}
+          value={Object.keys(getOrderDetail("designer"))[0]}
           onChanged={(key) =>
-            updateOrderDetail("customer", { [key]: selections.customers[key] })
+            updateOrderDetail("designer", { [key]: selections.designers[key] })
           }
         />
         <ComboBox

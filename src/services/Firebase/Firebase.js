@@ -15,6 +15,7 @@ import {
   getDocs,
   getDoc,
   Timestamp,
+  setDoc,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -204,6 +205,66 @@ class Firebase {
   }
 
   generateDocId = () => doc(collection(this.db, "orders")).id;
+
+  async createOrder(order) {
+    const orderId = Object.keys(order)[0];
+    const customerId = Object.keys(order[orderId].customer)[0];
+    const designerId = Object.keys(order[orderId].designer)[0];
+    const materialId = Object.keys(order[orderId].material)[0];
+    const statusId = Object.keys(order[orderId].status)[0];
+    await setDoc(doc(this.db, "orders", orderId), {
+      customerRef: doc(this.db, "customers", customerId),
+      date: Timestamp.fromDate(order[orderId].date),
+      design: order[orderId].design,
+      designerRef: doc(this.db, "designers", designerId),
+      id: order[orderId].id,
+      materialRef: doc(this.db, "materials", materialId),
+      remark: order[orderId].remark,
+      statusRef: doc(this.db, "status", statusId),
+    });
+
+    const variations = { ...order[orderId].variations };
+    for (const vId in variations) {
+      const collarId = Object.keys(variations[vId].collar)[0];
+      const sleeveId = Object.keys(variations[vId].sleeve)[0];
+      await setDoc(doc(this.db, "orders", orderId, "variations", vId), {
+        collarRef: doc(this.db, "collars", collarId),
+        color: variations[vId].color,
+        sleeveRef: doc(this.db, "sleeves", sleeveId),
+      });
+
+      const sizes = { ...variations[vId].sizes };
+      for (const sId in sizes) {
+        const sizeId = Object.keys(sizes[sId].size)[0];
+        await setDoc(
+          doc(this.db, "orders", orderId, "variations", vId, "sizes", sId),
+          { sizeRef: doc(this.db, "sizes", sizeId) }
+        );
+
+        const prints = { ...sizes[sId].prints };
+        for (const pId in prints) {
+          await setDoc(
+            doc(
+              this.db,
+              "orders",
+              orderId,
+              "variations",
+              vId,
+              "sizes",
+              sId,
+              "prints",
+              pId
+            ),
+            {
+              name: prints[pId].name,
+              number: prints[pId].number,
+              quantity: parseInt(prints[pId].quantity),
+            }
+          );
+        }
+      }
+    }
+  }
 
   // serverTimeStamp() {
   //   return app.firestore.FieldValue.serverTimestamp();

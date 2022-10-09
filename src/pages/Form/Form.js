@@ -1,15 +1,18 @@
 import Header from "../../components/Header";
-import { ChevronLeftIcon } from "@heroicons/react/24/solid";
-import { Link, useParams } from "react-router-dom";
+import { ChevronLeftIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { Link, useHistory, useParams } from "react-router-dom";
 import TextButton from "../../components/TextButton";
 import { useEffect, useState } from "react";
 import { withFirebase } from "../../services/Firebase";
 import FormVariation from "./FormVariation";
 import FormDetail from "./FormDetail";
 import MessageBox from "../../components/MessageBox";
+import IconButton from "../../components/IconButton";
 
 const Form = ({ firebase }) => {
   const { orderId: paramOrderId } = useParams();
+  const history = useHistory();
+  const isUpdate = !!paramOrderId;
 
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState({});
@@ -28,6 +31,7 @@ const Form = ({ firebase }) => {
   const getInitialData = async () => {
     const selections = {};
     selections["customers"] = await firebase.getChoices("customers");
+    selections["designers"] = await firebase.getChoices("designers");
     selections["sizes"] = await firebase.getChoices("sizes");
     selections["materials"] = await firebase.getChoices("materials");
     selections["status"] = await firebase.getChoices("status");
@@ -178,8 +182,8 @@ const Form = ({ firebase }) => {
       date: new Date(),
       design: "",
       designer: {
-        [Object.keys(selections.customers)[0]]: Object.values(
-          selections.customers
+        [Object.keys(selections.designers)[0]]: Object.values(
+          selections.designers
         )[0],
       },
       id: "",
@@ -217,10 +221,18 @@ const Form = ({ firebase }) => {
     return null;
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
+    console.log(order);
     setError(null);
     const error = validate(order, orderId);
     if (error) return setError(error);
+    try {
+      await firebase.createOrder(order);
+      history.push(`/${orderId}`);
+    } catch (e) {
+      console.log(e);
+      setError("Unknown error");
+    }
   };
 
   if (isLoading) {
@@ -268,10 +280,13 @@ const Form = ({ firebase }) => {
             <div className="flex-1">
               <TextButton
                 theme="dark"
-                text="Create Order"
+                text={isUpdate ? "Update Order" : "Create Order"}
                 onClicked={onSubmit}
               />
             </div>
+            {isUpdate && (
+              <IconButton theme="error" Icon={TrashIcon} onClick={() => {}} />
+            )}
           </div>
         </div>
       </div>
