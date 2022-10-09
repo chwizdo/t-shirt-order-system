@@ -45,7 +45,7 @@ const App = ({ firebase }) => {
           {!isAuthenticated ? (
             <Redirect to={{ pathname: "/login" }} />
           ) : (
-            <New />
+            <Form />
           )}
         </Route>
         <Route path="/:orderId">

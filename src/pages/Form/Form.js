@@ -8,11 +8,12 @@ import FormVariation from "./FormVariation";
 import FormDetail from "./FormDetail";
 
 const Form = ({ firebase }) => {
+  const { orderId: paramOrderId } = useParams();
+
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState({});
   const [selections, setSelections] = useState({});
-
-  const { orderId } = useParams();
+  const [orderId, setOrderId] = useState(paramOrderId);
 
   useEffect(() => {
     getInitialData();
@@ -31,7 +32,14 @@ const Form = ({ firebase }) => {
     selections["sleeves"] = await firebase.getChoices("sleeves");
     selections["collars"] = await firebase.getChoices("collars");
     setSelections(selections);
-    setOrder(await firebase.getOrder(orderId));
+    console.log(orderId);
+    if (orderId) {
+      setOrder(await firebase.getOrder(orderId));
+    } else {
+      const orderId = firebase.generateDocId();
+      setOrderId(orderId);
+      setOrder(createEmptyOrder(orderId, selections));
+    }
     setIsLoading(false);
   };
 
@@ -151,6 +159,36 @@ const Form = ({ firebase }) => {
       )[0],
     },
     sizes: { [sizeId]: createEmptySize(printId, selectedSizeId) },
+  });
+
+  const createEmptyOrder = (orderId, selections) => ({
+    [orderId]: {
+      customer: {
+        [Object.keys(selections.customers)[0]]: Object.values(
+          selections.customers
+        )[0],
+      },
+      date: new Date(),
+      design: "",
+      designer: {
+        [Object.keys(selections.customers)[0]]: Object.values(
+          selections.customers
+        )[0],
+      },
+      id: "",
+      material: {
+        [Object.keys(selections.materials)[0]]: Object.values(
+          selections.materials
+        )[0],
+      },
+      remark: "",
+      status: {
+        [Object.keys(selections.status)[0]]: Object.values(
+          selections.status
+        )[0],
+      },
+      variations: {},
+    },
   });
 
   if (isLoading) {

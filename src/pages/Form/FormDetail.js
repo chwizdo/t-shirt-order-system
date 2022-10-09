@@ -58,7 +58,7 @@ export default ({ selections, getOrderDetail, updateOrderDetail }) => {
         <textarea
           className="border-2 border-grey rounded-lg flex-1 py-4 px-6 outline-none focus:border-black transition"
           placeholder="Remarks"
-          value={getOrderDetail("remark") || ""}
+          value={getOrderDetail("remark")}
           onChange={(e) => updateOrderDetail("remark", e.target.value)}
         />
       </div>
