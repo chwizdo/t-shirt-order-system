@@ -16,6 +16,9 @@ import {
   getDoc,
   Timestamp,
   setDoc,
+  orderBy,
+  query,
+  limit,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -264,6 +267,13 @@ class Firebase {
         }
       }
     }
+  }
+
+  async getLatestOrderId() {
+    const q = query(collection(this.db, "orders"), orderBy("date"), limit(1));
+    const docs = (await getDocs(q)).docs;
+    if (docs.length <= 0) return null;
+    return docs[0].data().id;
   }
 
   // serverTimeStamp() {

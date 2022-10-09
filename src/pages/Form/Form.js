@@ -8,6 +8,7 @@ import FormVariation from "./FormVariation";
 import FormDetail from "./FormDetail";
 import MessageBox from "../../components/MessageBox";
 import IconButton from "../../components/IconButton";
+import moment from "moment";
 
 const Form = ({ firebase }) => {
   const { orderId: paramOrderId } = useParams();
@@ -43,7 +44,7 @@ const Form = ({ firebase }) => {
     } else {
       const orderId = firebase.generateDocId();
       setOrderId(orderId);
-      setOrder(createEmptyOrder(orderId, selections));
+      setOrder(await createEmptyOrder(orderId, selections));
     }
     setIsLoading(false);
   };
@@ -172,35 +173,46 @@ const Form = ({ firebase }) => {
     sizes: { [sizeId]: createEmptySize(printId, selectedSizeId) },
   });
 
-  const createEmptyOrder = (orderId, selections) => ({
-    [orderId]: {
-      customer: {
-        [Object.keys(selections.customers)[0]]: Object.values(
-          selections.customers
-        )[0],
+  const createEmptyOrder = async (orderId, selections) => {
+    const latestId = await firebase.getLatestOrderId();
+    let newId = moment(new Date()).format("YYMMDD");
+    if (latestId.startsWith(newId)) {
+      const count = latestId.split(newId)[1];
+      const newCount = parseInt(count) + 1;
+      newId += newCount;
+    } else {
+      newId += "1";
+    }
+    return {
+      [orderId]: {
+        customer: {
+          [Object.keys(selections.customers)[0]]: Object.values(
+            selections.customers
+          )[0],
+        },
+        date: new Date(),
+        design: "",
+        designer: {
+          [Object.keys(selections.designers)[0]]: Object.values(
+            selections.designers
+          )[0],
+        },
+        id: newId,
+        material: {
+          [Object.keys(selections.materials)[0]]: Object.values(
+            selections.materials
+          )[0],
+        },
+        remark: "",
+        status: {
+          [Object.keys(selections.status)[0]]: Object.values(
+            selections.status
+          )[0],
+        },
+        variations: {},
       },
-      date: new Date(),
-      design: "",
-      designer: {
-        [Object.keys(selections.designers)[0]]: Object.values(
-          selections.designers
-        )[0],
-      },
-      id: "",
-      material: {
-        [Object.keys(selections.materials)[0]]: Object.values(
-          selections.materials
-        )[0],
-      },
-      remark: "",
-      status: {
-        [Object.keys(selections.status)[0]]: Object.values(
-          selections.status
-        )[0],
-      },
-      variations: {},
-    },
-  });
+    };
+  };
 
   const validate = (order, orderId) => {
     // validate design
@@ -251,7 +263,9 @@ const Form = ({ firebase }) => {
           <ChevronLeftIcon className="w-5 h-5 text-black" />
           <span className="leading-tight underline">Back to Homepage</span>
         </Link>
-        <div className="text-xl leading-tight mb-12">O220916A</div>
+        <div className="text-xl leading-tight mb-12">
+          {getOrderDetail("id")}
+        </div>
         <FormDetail
           selections={selections}
           getOrderDetail={getOrderDetail}
