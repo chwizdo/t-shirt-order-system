@@ -5,14 +5,13 @@ import {
   Redirect,
 } from "react-router-dom";
 import Home from "./pages/Home";
-import New from "./pages/New";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Forget from "./pages/Forget";
 import Form from "./pages/Form";
 import { withFirebase } from "./services/Firebase";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, updateProfile } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 const App = ({ firebase }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
