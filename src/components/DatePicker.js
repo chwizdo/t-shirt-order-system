@@ -7,8 +7,10 @@ export default ({ value = new Date(), onChanged = () => {} }) => (
       id="new-date"
       type="date"
       className="w-full border-2 border-grey h-13 px-6 rounded-lg"
-      value={moment(value).format("YYYY-MM-DD")}
-      onChange={(e) => onChanged(new Date(e.target.value))}
+      value={value ? moment(value).format("YYYY-MM-DD") : ""}
+      onChange={(e) => {
+        onChanged(e.target.value ? new Date(e.target.value) : null);
+      }}
     />
     <label
       htmlFor="new-date"

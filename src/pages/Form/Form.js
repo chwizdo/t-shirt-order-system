@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { withFirebase } from "../../services/Firebase";
 import FormVariation from "./FormVariation";
 import FormDetail from "./FormDetail";
+import MessageBox from "../../components/MessageBox";
 
 const Form = ({ firebase }) => {
   const { orderId: paramOrderId } = useParams();
@@ -14,6 +15,7 @@ const Form = ({ firebase }) => {
   const [order, setOrder] = useState({});
   const [selections, setSelections] = useState({});
   const [orderId, setOrderId] = useState(paramOrderId);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     getInitialData();
@@ -32,7 +34,6 @@ const Form = ({ firebase }) => {
     selections["sleeves"] = await firebase.getChoices("sleeves");
     selections["collars"] = await firebase.getChoices("collars");
     setSelections(selections);
-    console.log(orderId);
     if (orderId) {
       setOrder(await firebase.getOrder(orderId));
     } else {
@@ -124,8 +125,14 @@ const Form = ({ firebase }) => {
   };
 
   const removePrint = (variationId, sizeId, printId) => {
+    const isLastSize =
+      Object.keys(getSizeDetail(variationId, sizeId, "prints")).length <= 1;
+    const isLastVariation =
+      Object.keys(getVariationDetail(variationId, "sizes")).length <= 1;
     const tempOrder = { ...order };
-    if (Object.keys(getSizeDetail(variationId, sizeId, "prints")).length <= 1) {
+    if (isLastVariation && isLastSize) {
+      delete tempOrder[orderId].variations[variationId];
+    } else if (!isLastVariation && isLastSize) {
       delete tempOrder[orderId].variations[variationId].sizes[sizeId];
     } else {
       delete tempOrder[orderId].variations[variationId].sizes[sizeId].prints[
@@ -138,7 +145,7 @@ const Form = ({ firebase }) => {
   const createEmptyPrint = () => ({
     name: "",
     number: "",
-    quantity: "",
+    quantity: 1,
   });
 
   const createEmptySize = (printId, sizeId) => ({
@@ -191,6 +198,31 @@ const Form = ({ firebase }) => {
     },
   });
 
+  const validate = (order, orderId) => {
+    // validate design
+    if (!order[orderId].design) return "Invalid design name";
+    // validate print quantity
+    const variations = { ...order[orderId].variations };
+    for (const vId in variations) {
+      const sizes = { ...variations[vId].sizes };
+      for (const sId in sizes) {
+        const prints = { ...sizes[sId].prints };
+        for (const pId in prints) {
+          if (isNaN(parseInt(prints[pId].quantity))) return "Invalid quantity";
+        }
+      }
+    }
+    // validate date
+    if (!order[orderId].date) return "Invalid date";
+    return null;
+  };
+
+  const onSubmit = () => {
+    setError(null);
+    const error = validate(order, orderId);
+    if (error) return setError(error);
+  };
+
   if (isLoading) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -227,12 +259,19 @@ const Form = ({ firebase }) => {
           updatePrintDetail={updatePrintDetail}
           removePrintDetail={removePrint}
         />
-        <div className="flex-1 flex space-x-4">
-          <div className="flex-1">
-            <TextButton theme="light" text="Preview PDF" />
-          </div>
-          <div className="flex-1">
-            <TextButton theme="dark" text="Create Order" />
+        <div className="space-y-4">
+          {error && <MessageBox message={`Error: ${error}`} type="error" />}
+          <div className="flex-1 flex space-x-4">
+            <div className="flex-1">
+              <TextButton theme="light" text="Preview PDF" />
+            </div>
+            <div className="flex-1">
+              <TextButton
+                theme="dark"
+                text="Create Order"
+                onClicked={onSubmit}
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -41,6 +41,7 @@ export default ({
             </div>
             <div className="w-[104px]">
               <TextField
+                type="number"
                 placeholder="1"
                 value={getPrintDetail(vId, sId, pId, "quantity")}
                 onChanged={(value) =>
