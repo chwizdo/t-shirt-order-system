@@ -203,6 +203,8 @@ class Firebase {
     return doc.data()[key] || null;
   }
 
+  generateDocId = () => doc(collection(this.db, "orders")).id;
+
   // serverTimeStamp() {
   //   return app.firestore.FieldValue.serverTimestamp();
   // }

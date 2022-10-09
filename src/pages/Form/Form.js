@@ -155,6 +155,8 @@ const Form = ({ firebase }) => {
 
   const addPrint = (variationId, sizeId) => {
     const printId = generatePrintId(variationId, sizeId);
+    // const newPrint = createEmptyPrint();
+
     const tempOrder = { ...order };
     tempOrder[orderId].variations[variationId].sizes[sizeId].prints[printId] =
       createEmptyPrint();
@@ -207,6 +209,83 @@ const Form = ({ firebase }) => {
     sleeve: { [Object.keys(sleeves)[0]]: Object.values(sleeves)[0] },
     sizes: { [sizeId]: createEmptySize(printId, selectedSizeId) },
   });
+
+  // const createEmptyPrint = ({
+  //   printId = firebase.generateDocId(),
+  //   name = "",
+  //   number = "",
+  //   quantity = 1,
+  // }) => {
+  //   return {
+  //     [printId]: { name: name, number: number, quantity: quantity },
+  //   };
+  // };
+
+  // const createEmptySize = ({
+  //   sizeId = firebase.generateDocId(),
+  //   printId = firebase.generateDocId(),
+  //   size = null,
+  //   name = "",
+  //   number = "",
+  //   quantity = 1,
+  // }) => {
+  //   return {
+  //     [sizeId]: {
+  //       size: size,
+  //       prints: createEmptyPrint({
+  //         printId: printId,
+  //         name: name,
+  //         number: number,
+  //         quantity,
+  //       }),
+  //     },
+  //   };
+  // };
+
+  // const createEmptyVariation = ({
+  //   variationId = firebase.generateDocId(),
+  //   sizeId = firebase.generateDocId(),
+  //   printId = firebase.generateDocId(),
+  //   collar = null,
+  //   color = "#DE0000",
+  //   sleeve = null,
+  //   size = null,
+  //   name = "",
+  //   number = "",
+  //   quantity = 1,
+  // }) => {
+  //   return {
+  //     [variationId]: {
+  //       collar: collar,
+  //       color: color,
+  //       sleeve: sleeve,
+  //       sizes: createEmptySize({
+  //         sizeId: sizeId,
+  //         printId: printId,
+  //         size: size,
+  //         name: name,
+  //         number: number,
+  //         quantity,
+  //       }),
+  //     },
+  //   };
+  // };
+
+  // const createEmptyOrder = (orderId) => {
+  //   return {
+  //     [orderId]: {
+  //       remark: "",
+  //       customer: null,
+  //       date: new Date(),
+  //       design: "",
+  //       designer: null,
+  //       id: "",
+  //       material: null,
+  //       status: null,
+  //       variations: createEmptyVariation(),
+  //     },
+  //   };
+  // };
 
   const customStyles = {
     content: {
