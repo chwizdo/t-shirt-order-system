@@ -74,11 +74,11 @@ const Home = ({ firebase }) => {
         {/* Filters */}
 
         <div className="grid grid-cols-3 gap-4 mb-12">
+          {/* <ComboBox />
           <ComboBox />
           <ComboBox />
           <ComboBox />
-          <ComboBox />
-          <ComboBox />
+          <ComboBox /> */}
         </div>
 
         {/* Table */}

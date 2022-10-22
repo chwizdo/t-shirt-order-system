@@ -9,8 +9,9 @@ import FormDetail from "./FormDetail";
 import MessageBox from "../../components/MessageBox";
 import IconButton from "../../components/IconButton";
 import moment from "moment";
+import { withModelUtil } from "../../services/ModelUtil";
 
-const Form = ({ firebase }) => {
+const Form = ({ firebase, modelUtil }) => {
   const { orderId: paramOrderId } = useParams();
   const history = useHistory();
   const isUpdate = !!paramOrderId;
@@ -47,17 +48,6 @@ const Form = ({ firebase }) => {
       setOrder(await createEmptyOrder(orderId, selections));
     }
     setIsLoading(false);
-  };
-
-  const getOrderDetail = (key) => {
-    const tempOrder = { ...order };
-    return tempOrder[orderId][key];
-  };
-
-  const updateOrderDetail = (key, value) => {
-    const tempOrder = { ...order };
-    tempOrder[orderId][key] = value;
-    setOrder(tempOrder);
   };
 
   const createVariation = () => {
@@ -264,16 +254,14 @@ const Form = ({ firebase }) => {
           <span className="leading-tight underline">Back to Homepage</span>
         </Link>
         <div className="text-xl leading-tight mb-12">
-          {getOrderDetail("id")}
+          {modelUtil.getTreeInfo(order, "id")}
+          {/* {getOrderDetail("id")} */}
         </div>
-        <FormDetail
-          selections={selections}
-          getOrderDetail={getOrderDetail}
-          updateOrderDetail={updateOrderDetail}
-        />
+        <FormDetail order={order} setOrder={setOrder} selections={selections} />
         <FormVariation
+          order={order}
           selections={selections}
-          getOrderDetail={getOrderDetail}
+          // getOrderDetail={getOrderDetail}
           createVariation={createVariation}
           getVariationDetail={getVariationDetail}
           updateVariationDetail={updateVariationDetail}
@@ -308,4 +296,4 @@ const Form = ({ firebase }) => {
   );
 };
 
-export default withFirebase(Form);
+export default withModelUtil(withFirebase(Form));
