@@ -2,6 +2,7 @@ import FormPrint from "./FormPrint";
 import TextButton from "../../components/TextButton";
 import { useState } from "react";
 import Modal from "react-modal";
+import { withModelUtil } from "../../services/ModelUtil";
 
 const customStyles = {
   content: {
@@ -13,10 +14,12 @@ const customStyles = {
   },
 };
 
-export default ({
+const FormSize = ({
+  modelUtil,
+  variation,
   vId,
   selections,
-  getVariationDetail,
+  // getVariationDetail,
   createSize,
   getSizeDetail,
   createPrint,
@@ -32,28 +35,31 @@ export default ({
 
   return (
     <div>
-      {Object.keys(getVariationDetail(vId, "sizes")).map((sId, sIdx) => {
-        return (
-          <div key={sIdx}>
-            <div className="text-base leading-tight mb-6">
-              {`${
-                Object.values(getSizeDetail(vId, sId, "size"))[0].name
-              } SIZE | ${
-                Object.keys(getSizeDetail(vId, sId, "size")).length
-              } TOTAL`}
+      {/* {Object.keys(getVariationDetail(vId, "sizes")).map((sId, sIdx) => { */}
+      {Object.keys(modelUtil.getTreeInfo(variation, "sizes")).map(
+        (sId, sIdx) => {
+          return (
+            <div key={sIdx}>
+              <div className="text-base leading-tight mb-6">
+                {`${
+                  Object.values(getSizeDetail(vId, sId, "size"))[0].name
+                } SIZE | ${
+                  Object.keys(getSizeDetail(vId, sId, "size")).length
+                } TOTAL`}
+              </div>
+              <FormPrint
+                vId={vId}
+                sId={sId}
+                getSizeDetail={getSizeDetail}
+                createPrint={createPrint}
+                getPrintDetail={getPrintDetail}
+                updatePrintDetail={updatePrintDetail}
+                removePrintDetail={removePrintDetail}
+              />
             </div>
-            <FormPrint
-              vId={vId}
-              sId={sId}
-              getSizeDetail={getSizeDetail}
-              createPrint={createPrint}
-              getPrintDetail={getPrintDetail}
-              updatePrintDetail={updatePrintDetail}
-              removePrintDetail={removePrintDetail}
-            />
-          </div>
-        );
-      })}
+          );
+        }
+      )}
       <div className="flex-1 mb-12">
         <TextButton
           theme="light"
@@ -94,3 +100,5 @@ export default ({
     </div>
   );
 };
+
+export default withModelUtil(FormSize);

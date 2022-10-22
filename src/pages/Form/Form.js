@@ -68,18 +68,6 @@ const Form = ({ firebase, modelUtil }) => {
     return tempOrder[orderId].variations[variationId][key];
   };
 
-  const updateVariationDetail = (variationId, key, value) => {
-    const tempOrder = { ...order };
-    tempOrder[orderId].variations[variationId][key] = value;
-    setOrder(tempOrder);
-  };
-
-  const removeVariation = (variationId) => {
-    const tempOrder = { ...order };
-    delete tempOrder[orderId].variations[variationId];
-    setOrder(tempOrder);
-  };
-
   const createSize = (variationId, selectedSizeId) => {
     const sizeId = firebase.generateDocId();
     const printId = firebase.generateDocId();
@@ -255,17 +243,12 @@ const Form = ({ firebase, modelUtil }) => {
         </Link>
         <div className="text-xl leading-tight mb-12">
           {modelUtil.getTreeInfo(order, "id")}
-          {/* {getOrderDetail("id")} */}
         </div>
         <FormDetail order={order} setOrder={setOrder} selections={selections} />
         <FormVariation
           order={order}
+          setOrder={setOrder}
           selections={selections}
-          // getOrderDetail={getOrderDetail}
-          createVariation={createVariation}
-          getVariationDetail={getVariationDetail}
-          updateVariationDetail={updateVariationDetail}
-          removeVariation={removeVariation}
           createSize={createSize}
           getSizeDetail={getSizeDetail}
           createPrint={createPrint}
