@@ -5,18 +5,7 @@ import { TrashIcon } from "@heroicons/react/24/solid";
 import FormSize from "./FormSize";
 import { withModelUtil } from "../../services/ModelUtil";
 
-const FormVariation = ({
-  order,
-  setOrder,
-  selections,
-  modelUtil,
-  createSize,
-  getSizeDetail,
-  createPrint,
-  getPrintDetail,
-  updatePrintDetail,
-  removePrintDetail,
-}) => {
+const FormVariation = ({ modelUtil, order, setOrder, selections }) => {
   const variationEntries = Object.entries(
     modelUtil.getTreeInfo(order, "variations")
   );
@@ -98,15 +87,8 @@ const FormVariation = ({
             <FormSize
               order={order}
               setOrder={setOrder}
-              vId={id}
-              selections={selections}
               variation={variation}
-              createSize={createSize}
-              getSizeDetail={getSizeDetail}
-              createPrint={createPrint}
-              getPrintDetail={getPrintDetail}
-              updatePrintDetail={updatePrintDetail}
-              removePrintDetail={removePrintDetail}
+              selections={selections}
             />
           </div>
         );

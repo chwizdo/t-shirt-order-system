@@ -50,107 +50,6 @@ const Form = ({ firebase, modelUtil }) => {
     setIsLoading(false);
   };
 
-  const createVariation = () => {
-    const variationId = firebase.generateDocId();
-    const sizeId = firebase.generateDocId();
-    const printId = firebase.generateDocId();
-    const tempOrder = { ...order };
-    tempOrder[orderId].variations[variationId] = createEmptyVariation(
-      sizeId,
-      printId,
-      Object.keys(selections.sizes)[0]
-    );
-    setOrder(tempOrder);
-  };
-
-  const getVariationDetail = (variationId, key) => {
-    const tempOrder = { ...order };
-    return tempOrder[orderId].variations[variationId][key];
-  };
-
-  const createSize = (variationId, selectedSizeId) => {
-    const sizeId = firebase.generateDocId();
-    const printId = firebase.generateDocId();
-    const tempOrder = { ...order };
-    tempOrder[orderId].variations[variationId].sizes[sizeId] = createEmptySize(
-      printId,
-      selectedSizeId
-    );
-    setOrder(tempOrder);
-  };
-
-  const getSizeDetail = (variationId, sizeId, key) => {
-    const tempOrder = { ...order };
-    return tempOrder[orderId].variations[variationId].sizes[sizeId][key];
-  };
-
-  const createPrint = (variationId, sizeId) => {
-    const printId = firebase.generateDocId();
-    const tempOrder = { ...order };
-    tempOrder[orderId].variations[variationId].sizes[sizeId].prints[printId] =
-      createEmptyPrint();
-    setOrder(tempOrder);
-  };
-
-  const getPrintDetail = (variationId, sizeId, printId, key) => {
-    const tempOrder = { ...order };
-    return tempOrder[orderId].variations[variationId].sizes[sizeId].prints[
-      printId
-    ][key];
-  };
-
-  const updatePrintDetail = (variationId, sizeId, printId, key, value) => {
-    const tempOrder = { ...order };
-    tempOrder[orderId].variations[variationId].sizes[sizeId].prints[printId][
-      key
-    ] = value;
-    setOrder(tempOrder);
-  };
-
-  const removePrint = (variationId, sizeId, printId) => {
-    const isLastSize =
-      Object.keys(getSizeDetail(variationId, sizeId, "prints")).length <= 1;
-    const isLastVariation =
-      Object.keys(getVariationDetail(variationId, "sizes")).length <= 1;
-    const tempOrder = { ...order };
-    if (isLastVariation && isLastSize) {
-      delete tempOrder[orderId].variations[variationId];
-    } else if (!isLastVariation && isLastSize) {
-      delete tempOrder[orderId].variations[variationId].sizes[sizeId];
-    } else {
-      delete tempOrder[orderId].variations[variationId].sizes[sizeId].prints[
-        printId
-      ];
-    }
-    setOrder(tempOrder);
-  };
-
-  const createEmptyPrint = () => ({
-    name: "",
-    number: "",
-    quantity: 1,
-  });
-
-  const createEmptySize = (printId, sizeId) => ({
-    size: { [sizeId]: selections.sizes[sizeId] },
-    prints: { [printId]: createEmptyPrint() },
-  });
-
-  const createEmptyVariation = (sizeId, printId, selectedSizeId) => ({
-    collar: {
-      [Object.keys(selections.collars)[0]]: Object.values(
-        selections.collars
-      )[0],
-    },
-    color: "#FF0000",
-    sleeve: {
-      [Object.keys(selections.sleeves)[0]]: Object.values(
-        selections.sleeves
-      )[0],
-    },
-    sizes: { [sizeId]: createEmptySize(printId, selectedSizeId) },
-  });
-
   const createEmptyOrder = async (orderId, selections) => {
     const latestId = await firebase.getLatestOrderId();
     let newId = moment(new Date()).format("YYMMDD");
@@ -249,12 +148,6 @@ const Form = ({ firebase, modelUtil }) => {
           order={order}
           setOrder={setOrder}
           selections={selections}
-          createSize={createSize}
-          getSizeDetail={getSizeDetail}
-          createPrint={createPrint}
-          getPrintDetail={getPrintDetail}
-          updatePrintDetail={updatePrintDetail}
-          removePrintDetail={removePrint}
         />
         <div className="space-y-4">
           {error && <MessageBox message={`Error: ${error}`} type="error" />}

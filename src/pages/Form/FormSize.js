@@ -14,19 +14,7 @@ const customStyles = {
   },
 };
 
-const FormSize = ({
-  order,
-  setOrder,
-  modelUtil,
-  variation,
-  vId,
-  selections,
-  getSizeDetail,
-  createPrint,
-  getPrintDetail,
-  updatePrintDetail,
-  removePrintDetail,
-}) => {
+const FormSize = ({ modelUtil, order, setOrder, variation, selections }) => {
   const [modalIsOpen, setIsOpen] = useState(false);
 
   const openModal = () => setIsOpen(true);
@@ -36,11 +24,11 @@ const FormSize = ({
   return (
     <div>
       {Object.entries(modelUtil.getTreeInfo(variation, "sizes")).map(
-        ([id, infos], idx) => {
+        ([id, infos]) => {
           const size = { [id]: infos };
 
           return (
-            <div key={idx}>
+            <div key={id}>
               <div className="text-base leading-tight mb-6">
                 {`${modelUtil.getTreeInfo(
                   modelUtil.getTreeInfo(size, "size"),
@@ -48,13 +36,10 @@ const FormSize = ({
                 )} SIZE`}
               </div>
               <FormPrint
-                vId={vId}
-                sId={id}
-                getSizeDetail={getSizeDetail}
-                createPrint={createPrint}
-                getPrintDetail={getPrintDetail}
-                updatePrintDetail={updatePrintDetail}
-                removePrintDetail={removePrintDetail}
+                order={order}
+                setOrder={setOrder}
+                variation={variation}
+                size={size}
               />
             </div>
           );
