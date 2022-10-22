@@ -15,12 +15,12 @@ const customStyles = {
 };
 
 const FormSize = ({
+  order,
+  setOrder,
   modelUtil,
   variation,
   vId,
   selections,
-  // getVariationDetail,
-  createSize,
   getSizeDetail,
   createPrint,
   getPrintDetail,
@@ -35,21 +35,21 @@ const FormSize = ({
 
   return (
     <div>
-      {/* {Object.keys(getVariationDetail(vId, "sizes")).map((sId, sIdx) => { */}
-      {Object.keys(modelUtil.getTreeInfo(variation, "sizes")).map(
-        (sId, sIdx) => {
+      {Object.entries(modelUtil.getTreeInfo(variation, "sizes")).map(
+        ([id, infos], idx) => {
+          const size = { [id]: infos };
+
           return (
-            <div key={sIdx}>
+            <div key={idx}>
               <div className="text-base leading-tight mb-6">
-                {`${
-                  Object.values(getSizeDetail(vId, sId, "size"))[0].name
-                } SIZE | ${
-                  Object.keys(getSizeDetail(vId, sId, "size")).length
-                } TOTAL`}
+                {`${modelUtil.getTreeInfo(
+                  modelUtil.getTreeInfo(size, "size"),
+                  "name"
+                )} SIZE`}
               </div>
               <FormPrint
                 vId={vId}
-                sId={sId}
+                sId={id}
                 getSizeDetail={getSizeDetail}
                 createPrint={createPrint}
                 getPrintDetail={getPrintDetail}
@@ -90,7 +90,15 @@ const FormSize = ({
               theme="light"
               text={selections.sizes[sId].name}
               onClicked={() => {
-                createSize(vId, sId);
+                const sizeId = Object.keys(selections.sizes)[0];
+
+                const s = modelUtil.getEmptySize({
+                  [sizeId]: selections.sizes[sizeId],
+                });
+                const v = modelUtil.updateSubTree(variation, "sizes", s);
+                const o = modelUtil.updateSubTree(order, "variations", v);
+                setOrder(o);
+
                 setIsOpen(false);
               }}
             />

@@ -96,6 +96,8 @@ const FormVariation = ({
               </label>
             </div>
             <FormSize
+              order={order}
+              setOrder={setOrder}
               vId={id}
               selections={selections}
               variation={variation}
