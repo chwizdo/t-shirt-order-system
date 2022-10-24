@@ -3,6 +3,7 @@ import moment from "moment";
 class ModelUtil {
   constructor(firebase) {
     this.firebase = firebase;
+    console.log(this.firebase);
   }
 
   getTreeId = (tree) => {
@@ -67,7 +68,7 @@ class ModelUtil {
   getNewOrderId = async () => {
     const lastId = await this.firebase.getLatestOrderId();
     let newId = moment(new Date()).format("YYMMDD");
-    if (lastId.startsWith(newId)) {
+    if (lastId != null && lastId.startsWith(newId)) {
       const lastCount = lastId.split(newId)[1];
       const newCount = parseInt(lastCount) + 1;
       newId += newCount;
@@ -80,7 +81,7 @@ class ModelUtil {
   getEmptyOrder = async (customer, designer, material, status) => {
     const orderId = await this.getNewOrderId();
     return {
-      [this.firebase.generateDocId]: {
+      [this.firebase.generateDocId()]: {
         customer: customer,
         date: new Date(),
         design: "",

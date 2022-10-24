@@ -11,15 +11,15 @@ import IconButton from "../../components/IconButton";
 import { withModelUtil } from "../../services/ModelUtil";
 
 const Form = ({ firebase, modelUtil }) => {
-  const { orderId: paramOrderId } = useParams();
+  const { orderId } = useParams();
   const history = useHistory();
-  const isUpdate = !!paramOrderId;
+  const isUpdate = !!orderId;
 
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState({});
   const [selections, setSelections] = useState({});
-  const [orderId, setOrderId] = useState(paramOrderId);
   const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     getInitialData();
@@ -62,34 +62,44 @@ const Form = ({ firebase, modelUtil }) => {
     return selections;
   };
 
-  const validate = (order, orderId) => {
-    // validate design
-    if (!order[orderId].design) return "Invalid design name";
-    // validate print quantity
-    const variations = { ...order[orderId].variations };
-    for (const vId in variations) {
-      const sizes = { ...variations[vId].sizes };
-      for (const sId in sizes) {
-        const prints = { ...sizes[sId].prints };
-        for (const pId in prints) {
-          if (isNaN(parseInt(prints[pId].quantity))) return "Invalid quantity";
+  const validate = (order) => {
+    // validate design.
+    const design = modelUtil.getTreeInfo(order, "design");
+    if (!design) return "Invalid design name";
+
+    // validate date.
+    const date = modelUtil.getTreeInfo(order, "date");
+    if (!date) return "Invalid date";
+
+    // validate print quantity.
+    const variationTrees = modelUtil.getTreeInfo(order, "variations");
+    for (const vId in variationTrees) {
+      const sizeTrees = modelUtil.getTreeInfo(variationTrees[vId], "sizes");
+      for (const sId in sizeTrees) {
+        const printTrees = modelUtil.getTreeInfo(sizeTrees[sId], "prints");
+        for (const pId in printTrees) {
+          const quantity = modelUtil.getTreeInfo(printTrees[pId], "quantity");
+          if (isNaN(parseInt(quantity))) return "Invalid quantity";
         }
       }
     }
-    // validate date
-    if (!order[orderId].date) return "Invalid date";
+
+    // If all validations are passed.
     return null;
   };
 
   const onSubmit = async () => {
     setError(null);
-    const error = validate(order, orderId);
+    const error = validate(order);
     if (error) return setError(error);
     try {
-      await firebase.createOrder(order);
+      const orderId = modelUtil.getTreeId(order);
+      setIsSubmitting(true);
+      await firebase.setOrder(order);
+      setIsSubmitting(false);
       history.push(`/${orderId}`);
     } catch (e) {
-      console.log(e);
+      setIsSubmitting(false);
       setError("Unknown error");
     }
   };
@@ -130,11 +140,10 @@ const Form = ({ firebase, modelUtil }) => {
                 theme="dark"
                 text={isUpdate ? "Update Order" : "Create Order"}
                 onClicked={onSubmit}
+                isLoading={isSubmitting}
               />
             </div>
-            {isUpdate && (
-              <IconButton theme="error" Icon={TrashIcon} onClick={() => {}} />
-            )}
+            {isUpdate && <IconButton theme="error" Icon={TrashIcon} />}
           </div>
         </div>
       </div>

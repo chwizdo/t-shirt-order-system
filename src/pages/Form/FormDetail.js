@@ -77,7 +77,7 @@ const FormDetail = ({ order, setOrder, modelUtil, selections }) => {
         <textarea
           className="border-2 border-grey rounded-lg flex-1 py-4 px-6 outline-none focus:border-black transition"
           placeholder="Remarks"
-          value={modelUtil.getTreeId(modelUtil.getTreeInfo(order, "remark"))}
+          value={modelUtil.getTreeInfo(order, "remark")}
           onChange={(e) => {
             const o = modelUtil.updateTreeInfo(order, "remark", e.target.value);
             setOrder(o);

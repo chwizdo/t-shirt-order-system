@@ -20,6 +20,7 @@ import {
   query,
   limit,
 } from "firebase/firestore";
+import ModelUtil from "../ModelUtil";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD34KJ19zqZs5nhhTydo_JP3XIrcS9Uuxc",
@@ -37,6 +38,11 @@ class Firebase {
     this.analytics = getAnalytics(this.app);
     this.auth = getAuth(this.app);
     this.db = getFirestore(this.app);
+    this.modelUtil = new ModelUtil(this);
+    this.o = "orders";
+    this.v = "variations";
+    this.s = "sizes";
+    this.p = "prints";
   }
 
   async signUp(name, email, password) {
@@ -209,65 +215,79 @@ class Firebase {
 
   generateDocId = () => doc(collection(this.db, "orders")).id;
 
-  async createOrder(order) {
-    const orderId = Object.keys(order)[0];
-    const customerId = Object.keys(order[orderId].customer)[0];
-    const designerId = Object.keys(order[orderId].designer)[0];
-    const materialId = Object.keys(order[orderId].material)[0];
-    const statusId = Object.keys(order[orderId].status)[0];
-    await setDoc(doc(this.db, "orders", orderId), {
+  setOrder = async (orderTree) => {
+    const oId = this.modelUtil.getTreeId(orderTree);
+    const customer = this.modelUtil.getTreeInfo(orderTree, "customer");
+    const customerId = this.modelUtil.getTreeId(customer);
+    const designer = this.modelUtil.getTreeInfo(orderTree, "designer");
+    const designerId = this.modelUtil.getTreeId(designer);
+    const material = this.modelUtil.getTreeInfo(orderTree, "material");
+    const materialId = this.modelUtil.getTreeId(material);
+    const status = this.modelUtil.getTreeInfo(orderTree, "status");
+    const statusId = this.modelUtil.getTreeId(status);
+    const design = this.modelUtil.getTreeInfo(orderTree, "design");
+    const date = this.modelUtil.getTreeInfo(orderTree, "date");
+    const id = this.modelUtil.getTreeInfo(orderTree, "id");
+    const remark = this.modelUtil.getTreeInfo(orderTree, "remark");
+    const variationTrees = this.modelUtil.getTreeInfo(orderTree, "variations");
+    await setDoc(doc(this.db, this.o, oId), {
       customerRef: doc(this.db, "customers", customerId),
-      date: Timestamp.fromDate(order[orderId].date),
-      design: order[orderId].design,
+      date: Timestamp.fromDate(date),
+      design: design,
       designerRef: doc(this.db, "designers", designerId),
-      id: order[orderId].id,
+      id: id,
       materialRef: doc(this.db, "materials", materialId),
-      remark: order[orderId].remark,
+      remark: remark,
       statusRef: doc(this.db, "status", statusId),
     });
-
-    const variations = { ...order[orderId].variations };
-    for (const vId in variations) {
-      const collarId = Object.keys(variations[vId].collar)[0];
-      const sleeveId = Object.keys(variations[vId].sleeve)[0];
-      await setDoc(doc(this.db, "orders", orderId, "variations", vId), {
-        collarRef: doc(this.db, "collars", collarId),
-        color: variations[vId].color,
-        sleeveRef: doc(this.db, "sleeves", sleeveId),
-      });
-
-      const sizes = { ...variations[vId].sizes };
-      for (const sId in sizes) {
-        const sizeId = Object.keys(sizes[sId].size)[0];
-        await setDoc(
-          doc(this.db, "orders", orderId, "variations", vId, "sizes", sId),
-          { sizeRef: doc(this.db, "sizes", sizeId) }
-        );
-
-        const prints = { ...sizes[sId].prints };
-        for (const pId in prints) {
-          await setDoc(
-            doc(
-              this.db,
-              "orders",
-              orderId,
-              "variations",
-              vId,
-              "sizes",
-              sId,
-              "prints",
-              pId
-            ),
-            {
-              name: prints[pId].name,
-              number: prints[pId].number,
-              quantity: parseInt(prints[pId].quantity),
-            }
-          );
-        }
-      }
+    for (const [vId, vInfo] of Object.entries(variationTrees)) {
+      console.log(vId);
+      await this.setVariation({ [vId]: vInfo }, oId);
     }
-  }
+  };
+
+  setVariation = async (variationTree, oId) => {
+    const vId = this.modelUtil.getTreeId(variationTree);
+    const collar = this.modelUtil.getTreeInfo(variationTree, "collar");
+    const collarId = this.modelUtil.getTreeId(collar);
+    const color = this.modelUtil.getTreeInfo(variationTree, "color");
+    const sleeve = this.modelUtil.getTreeInfo(variationTree, "sleeve");
+    const sleeveId = this.modelUtil.getTreeId(sleeve);
+    const sizeTrees = this.modelUtil.getTreeInfo(variationTree, "sizes");
+
+    await setDoc(doc(this.db, this.o, oId, this.v, vId), {
+      collarRef: doc(this.db, "collars", collarId),
+      color: color,
+      sleeveRef: doc(this.db, "sleeves", sleeveId),
+    });
+    for (const [sId, sInfo] of Object.entries(sizeTrees)) {
+      await this.setSize({ [sId]: sInfo }, oId, vId);
+    }
+  };
+
+  setSize = async (sizeTree, oId, vId) => {
+    const sId = this.modelUtil.getTreeId(sizeTree);
+    const size = this.modelUtil.getTreeInfo(sizeTree, "size");
+    const sizeId = this.modelUtil.getTreeId(size);
+    const printTrees = this.modelUtil.getTreeInfo(sizeTree, "prints");
+    await setDoc(doc(this.db, this.o, oId, this.v, vId, this.s, sId), {
+      sizeRef: doc(this.db, "sizes", sizeId),
+    });
+    for (const [pId, pInfo] of Object.entries(printTrees)) {
+      await this.setPrint({ [pId]: pInfo }, oId, vId, sId);
+    }
+  };
+
+  setPrint = async (printTree, oId, vId, sId) => {
+    const pId = this.modelUtil.getTreeId(printTree);
+    const name = this.modelUtil.getTreeInfo(printTree, "name");
+    const number = this.modelUtil.getTreeInfo(printTree, "number");
+    const quantity = this.modelUtil.getTreeInfo(printTree, "quantity");
+    await setDoc(
+      doc(this.db, this.o, oId, this.v, vId, this.s, sId, this.p, pId),
+      { name: name, number: number, quantity: quantity }
+    );
+  };
 
   async getLatestOrderId() {
     const q = query(collection(this.db, "orders"), orderBy("date"), limit(1));
@@ -275,10 +295,6 @@ class Firebase {
     if (docs.length <= 0) return null;
     return docs[0].data().id;
   }
-
-  // serverTimeStamp() {
-  //   return app.firestore.FieldValue.serverTimestamp();
-  // }
 }
 
 export default Firebase;
