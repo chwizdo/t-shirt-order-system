@@ -13,7 +13,6 @@ import { useEffect, useState } from "react";
 import NumberButton from "../../components/NumberButton";
 import { useHistory } from "react-router-dom";
 import { withFirebase } from "../../services/Firebase";
-import moment from "moment";
 
 const Home = ({ firebase }) => {
   const onMenuClicked = () => firebase.logout();
@@ -30,10 +29,6 @@ const Home = ({ firebase }) => {
   useEffect(() => {
     getInitialData();
   }, []);
-
-  useEffect(() => {
-    console.log(summaries);
-  }, [summaries]);
 
   const getInitialData = async () => {
     const summaries = await firebase.getSummaries();

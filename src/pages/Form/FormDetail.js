@@ -3,8 +3,14 @@ import TextField from "../../components/TextField";
 import DatePicker from "../../components/DatePicker";
 import SelectBox from "../../components/SelectBox";
 import { withModelUtil } from "../../services/ModelUtil";
+import { useState } from "react";
+import { withFirebase } from "../../services/Firebase";
 
-const FormDetail = ({ order, setOrder, modelUtil, selections }) => {
+const FormDetail = ({ order, setOrder, modelUtil, selections, firebase }) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const image = modelUtil.getTreeInfo(order, "image");
+
   return (
     <div className="flex space-x-4 mb-12">
       <div className="flex-1 space-y-4">
@@ -69,10 +75,40 @@ const FormDetail = ({ order, setOrder, modelUtil, selections }) => {
       </div>
       <div className="w-64 space-y-4 flex flex-col">
         <div className="h-64 rounded-lg overflow-hidden border-2 border-grey">
-          <img
-            className="h-full w-full object-cover"
-            src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
+          <input
+            type="file"
+            className="hidden"
+            id="image"
+            accept="image/png,image/jpeg"
+            onChange={async (e) => {
+              if (!e.target.files || e.target.files.length === 0) return;
+              setIsUploading(true);
+              const id = modelUtil.getTreeInfo(order, "id");
+              await firebase.uploadImage(e.target.files[0], id);
+              const image = await firebase.getImageUrl(id);
+              const o = modelUtil.updateTreeInfo(order, "image", image);
+              setOrder(o);
+              setIsUploading(false);
+            }}
           />
+          {isUploading ? (
+            <div className="h-full w-full flex justify-center items-center">
+              Uploading Image
+            </div>
+          ) : (
+            <label htmlFor="image">
+              {image ? (
+                <img
+                  className="h-full w-full object-cover"
+                  src={modelUtil.getTreeInfo(order, "image")}
+                />
+              ) : (
+                <div className="h-full w-full flex justify-center items-center">
+                  Select Image
+                </div>
+              )}
+            </label>
+          )}
         </div>
         <textarea
           className="border-2 border-grey rounded-lg flex-1 py-4 px-6 outline-none focus:border-black transition"
@@ -88,4 +124,4 @@ const FormDetail = ({ order, setOrder, modelUtil, selections }) => {
   );
 };
 
-export default withModelUtil(FormDetail);
+export default withFirebase(withModelUtil(FormDetail));

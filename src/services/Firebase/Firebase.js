@@ -21,6 +21,7 @@ import {
   limit,
 } from "firebase/firestore";
 import ModelUtil from "../ModelUtil";
+import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD34KJ19zqZs5nhhTydo_JP3XIrcS9Uuxc",
@@ -39,6 +40,7 @@ class Firebase {
     this.auth = getAuth(this.app);
     this.db = getFirestore(this.app);
     this.modelUtil = new ModelUtil(this);
+    this.storage = getStorage(this.app);
     this.o = "orders";
     this.v = "variations";
     this.s = "sizes";
@@ -122,6 +124,22 @@ class Firebase {
     return summaries;
   }
 
+  uploadImage = async (image, oId) => {
+    await uploadBytes(ref(this.storage, oId), image);
+  };
+
+  getImageUrl = async (path) => {
+    if (path) {
+      try {
+        return await getDownloadURL(ref(this.storage, path));
+      } catch (e) {
+        console.log(e.code);
+        return null;
+      }
+    }
+    return null;
+  };
+
   // Get a single full order details.
   async getOrder(orderId) {
     const orderDoc = await getDoc(doc(this.db, "orders", orderId));
@@ -136,6 +154,7 @@ class Firebase {
         remark: this.getSingleValue(orderDoc, "remark"),
         status: await this.getReferenceValue(orderDoc, "statusRef"),
         variations: await this.getOrderVariations(orderDoc),
+        image: await this.getImageUrl(this.getSingleValue(orderDoc, "id")),
       },
     };
   }

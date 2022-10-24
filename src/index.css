@@ -632,12 +632,12 @@ video {
   margin-bottom: 3rem;
 }
 
-.mb-6 {
-  margin-bottom: 1.5rem;
-}
-
 .mb-4 {
   margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
 }
 
 .block {
@@ -650,6 +650,10 @@ video {
 
 .grid {
   display: grid;
+}
+
+.hidden {
+  display: none;
 }
 
 .h-screen {
@@ -811,6 +815,10 @@ video {
   border-radius: 0.5rem;
 }
 
+.rounded-none {
+  border-radius: 0px;
+}
+
 .border-2 {
   border-width: 2px;
 }
@@ -869,6 +877,10 @@ video {
 .bg-error {
   --tw-bg-opacity: 1;
   background-color: rgb(222 0 0 / var(--tw-bg-opacity));
+}
+
+.object-contain {
+  object-fit: contain;
 }
 
 .object-cover {

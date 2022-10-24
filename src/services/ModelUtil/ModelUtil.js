@@ -3,7 +3,6 @@ import moment from "moment";
 class ModelUtil {
   constructor(firebase) {
     this.firebase = firebase;
-    console.log(this.firebase);
   }
 
   getTreeId = (tree) => {
@@ -91,6 +90,7 @@ class ModelUtil {
         remark: "",
         status: status,
         variations: {},
+        image: "",
       },
     };
   };
