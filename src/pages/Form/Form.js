@@ -8,7 +8,6 @@ import FormVariation from "./FormVariation";
 import FormDetail from "./FormDetail";
 import MessageBox from "../../components/MessageBox";
 import IconButton from "../../components/IconButton";
-import moment from "moment";
 import { withModelUtil } from "../../services/ModelUtil";
 
 const Form = ({ firebase, modelUtil }) => {
@@ -31,6 +30,27 @@ const Form = ({ firebase, modelUtil }) => {
   }, [order]);
 
   const getInitialData = async () => {
+    const selections = await getSelections();
+    setSelections(selections);
+    if (orderId) {
+      setOrder(await firebase.getOrder(orderId));
+    } else {
+      const customerId = Object.keys(selections.customers)[0];
+      const designerId = Object.keys(selections.designers)[0];
+      const materialId = Object.keys(selections.materials)[0];
+      const statusId = Object.keys(selections.status)[0];
+      const emptyOrder = await modelUtil.getEmptyOrder(
+        { [customerId]: selections.customers[customerId] },
+        { [designerId]: selections.designers[designerId] },
+        { [materialId]: selections.materials[materialId] },
+        { [statusId]: selections.status[statusId] }
+      );
+      setOrder(emptyOrder);
+    }
+    setIsLoading(false);
+  };
+
+  const getSelections = async () => {
     const selections = {};
     selections["customers"] = await firebase.getChoices("customers");
     selections["designers"] = await firebase.getChoices("designers");
@@ -39,56 +59,7 @@ const Form = ({ firebase, modelUtil }) => {
     selections["status"] = await firebase.getChoices("status");
     selections["sleeves"] = await firebase.getChoices("sleeves");
     selections["collars"] = await firebase.getChoices("collars");
-    setSelections(selections);
-    if (orderId) {
-      setOrder(await firebase.getOrder(orderId));
-    } else {
-      const orderId = firebase.generateDocId();
-      setOrderId(orderId);
-      setOrder(await createEmptyOrder(orderId, selections));
-    }
-    setIsLoading(false);
-  };
-
-  const createEmptyOrder = async (orderId, selections) => {
-    const latestId = await firebase.getLatestOrderId();
-    let newId = moment(new Date()).format("YYMMDD");
-    if (latestId.startsWith(newId)) {
-      const count = latestId.split(newId)[1];
-      const newCount = parseInt(count) + 1;
-      newId += newCount;
-    } else {
-      newId += "1";
-    }
-    return {
-      [orderId]: {
-        customer: {
-          [Object.keys(selections.customers)[0]]: Object.values(
-            selections.customers
-          )[0],
-        },
-        date: new Date(),
-        design: "",
-        designer: {
-          [Object.keys(selections.designers)[0]]: Object.values(
-            selections.designers
-          )[0],
-        },
-        id: newId,
-        material: {
-          [Object.keys(selections.materials)[0]]: Object.values(
-            selections.materials
-          )[0],
-        },
-        remark: "",
-        status: {
-          [Object.keys(selections.status)[0]]: Object.values(
-            selections.status
-          )[0],
-        },
-        variations: {},
-      },
-    };
+    return selections;
   };
 
   const validate = (order, orderId) => {
@@ -111,7 +82,6 @@ const Form = ({ firebase, modelUtil }) => {
   };
 
   const onSubmit = async () => {
-    console.log(order);
     setError(null);
     const error = validate(order, orderId);
     if (error) return setError(error);
