@@ -12,6 +12,7 @@ import Form from "./pages/Form";
 import { withFirebase } from "./services/Firebase";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
+import Setting from "./pages/Setting";
 
 const App = ({ firebase }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -24,7 +25,9 @@ const App = ({ firebase }) => {
 
   if (isAuthenticated === null) {
     return (
-      <div className="h-screen flex justify-center items-center">Loading</div>
+      <div className="h-screen flex justify-center items-center">
+        Loading...
+      </div>
     );
   }
 
@@ -39,6 +42,13 @@ const App = ({ firebase }) => {
         </Route>
         <Route path="/forget">
           {isAuthenticated ? <Redirect to={{ pathname: "/" }} /> : <Forget />}
+        </Route>
+        <Route path="/setting">
+          {!isAuthenticated ? (
+            <Redirect to={{ pathname: "/login" }} />
+          ) : (
+            <Setting />
+          )}
         </Route>
         <Route path="/new">
           {!isAuthenticated ? (

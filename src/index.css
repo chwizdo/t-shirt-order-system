@@ -765,6 +765,10 @@ video {
   justify-content: center;
 }
 
+.justify-between {
+  justify-content: space-between;
+}
+
 .gap-4 {
   gap: 1rem;
 }
@@ -813,10 +817,6 @@ video {
 
 .rounded-lg {
   border-radius: 0.5rem;
-}
-
-.rounded-none {
-  border-radius: 0px;
 }
 
 .border-2 {
@@ -877,10 +877,6 @@ video {
 .bg-error {
   --tw-bg-opacity: 1;
   background-color: rgb(222 0 0 / var(--tw-bg-opacity));
-}
-
-.object-contain {
-  object-fit: contain;
 }
 
 .object-cover {

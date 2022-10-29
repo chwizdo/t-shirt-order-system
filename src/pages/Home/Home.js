@@ -8,6 +8,7 @@ import {
   Bars3Icon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  Cog6ToothIcon,
 } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import NumberButton from "../../components/NumberButton";
@@ -16,9 +17,8 @@ import { withFirebase } from "../../services/Firebase";
 
 const Home = ({ firebase }) => {
   const onMenuClicked = () => firebase.logout();
-  const onNewOrderClicked = () => {
-    history.push("/new");
-  };
+  const onNewOrderClicked = () => history.push("/new");
+  const onSettingClicked = () => history.push("/setting");
 
   const [query, setQuery] = useState("");
   const [summaries, setSummaries] = useState({});
@@ -63,7 +63,7 @@ const Home = ({ firebase }) => {
               onChanged={setQuery}
             />
           </div>
-          <IconButton Icon={Bars3Icon} onClick={onMenuClicked} />
+          <IconButton Icon={Cog6ToothIcon} onClick={onSettingClicked} />
         </div>
 
         {/* Filters */}
