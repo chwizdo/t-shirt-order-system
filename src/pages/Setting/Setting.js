@@ -94,9 +94,41 @@ const Setting = ({ firebase, modelUtil }) => {
           title="Collar"
           addButtonText="New collar"
           trees={collars}
-          onAddHandler={() => {}}
           onEditHandler={getOnEditHandler("collars", collars, setCollars)}
           onRemoveHandler={getOnRemoveHandler("collars", collars, setCollars)}
+          onAddHandler={getOnAddHandler("collars", collars, setCollars)}
+        />
+        <SettingSection
+          title="Sleeve"
+          addButtonText="New sleeve"
+          trees={sleeves}
+          onEditHandler={getOnEditHandler("sleeves", sleeves, setSleeves)}
+          onRemoveHandler={getOnRemoveHandler("sleeves", sleeves, setSleeves)}
+          onAddHandler={getOnAddHandler("sleeves", sleeves, setSleeves)}
+        />
+        <SettingSection
+          title="Material"
+          addButtonText="New material"
+          trees={materials}
+          onEditHandler={getOnEditHandler("materials", materials, setMaterials)}
+          onRemoveHandler={getOnRemoveHandler(
+            "materials",
+            materials,
+            setMaterials
+          )}
+          onAddHandler={getOnAddHandler("materials", materials, setMaterials)}
+        />
+        <SettingSection
+          title="Designer"
+          addButtonText="New designer"
+          trees={designers}
+          onEditHandler={getOnEditHandler("designers", designers, setDesigners)}
+          onRemoveHandler={getOnRemoveHandler(
+            "designers",
+            designers,
+            setDesigners
+          )}
+          onAddHandler={getOnAddHandler("designers", designers, setDesigners)}
         />
       </div>
     </div>
