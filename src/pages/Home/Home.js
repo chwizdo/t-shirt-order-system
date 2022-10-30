@@ -1,17 +1,12 @@
-import ComboBox from "../../components/ComboBox";
 import Header from "../../components/Header";
 import IconButton from "../../components/IconButton";
 import TableRow from "../../components/TableRow";
 import TextButton from "../../components/TextButton";
-import TextField from "../../components/TextField";
 import {
   ArrowRightOnRectangleIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
   Cog6ToothIcon,
 } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
-import NumberButton from "../../components/NumberButton";
 import { useHistory } from "react-router-dom";
 import { withFirebase } from "../../services/Firebase";
 

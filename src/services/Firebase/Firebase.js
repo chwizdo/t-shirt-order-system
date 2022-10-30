@@ -17,6 +17,9 @@ import {
   Timestamp,
   setDoc,
   deleteDoc,
+  where,
+  query,
+  updateDoc,
 } from "firebase/firestore";
 import ModelUtil from "../ModelUtil";
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
@@ -121,7 +124,11 @@ class Firebase {
 
   // Get order summaries to populate home page.
   async getSummaries() {
-    const orderDocs = (await getDocs(collection(this.db, "orders"))).docs;
+    const orderDocs = (
+      await getDocs(
+        query(collection(this.db, "orders"), where("isVisible", "==", true))
+      )
+    ).docs;
     const summaries = {};
     for (const orderDoc of orderDocs) {
       summaries[orderDoc.id] = {
@@ -149,6 +156,10 @@ class Firebase {
     return null;
   };
 
+  deleteOrder = async (oId) => {
+    await updateDoc(doc(this.db, this.o, oId), { isVisible: false });
+  };
+
   // Get a single full order details.
   async getOrder(orderId) {
     const orderDoc = await getDoc(doc(this.db, "orders", orderId));
@@ -163,6 +174,7 @@ class Firebase {
         status: await this.getReferenceValue(orderDoc, "statusRef"),
         variations: await this.getOrderVariations(orderDoc),
         image: await this.getImageUrl(orderId),
+        isVisible: this.getSingleBoolean(orderDoc, "isVisible"),
       },
     };
   }
@@ -240,6 +252,10 @@ class Firebase {
     return doc.data()[key] || null;
   }
 
+  getSingleBoolean(doc, key) {
+    return !!doc.data()[key];
+  }
+
   generateDocId = () => doc(collection(this.db, "orders")).id;
 
   setOrder = async (orderTree) => {
@@ -256,6 +272,7 @@ class Firebase {
     const date = this.modelUtil.getTreeInfo(orderTree, "date");
     const remark = this.modelUtil.getTreeInfo(orderTree, "remark");
     const variationTrees = this.modelUtil.getTreeInfo(orderTree, "variations");
+    const isVisible = this.modelUtil.getTreeInfo(orderTree, "isVisible");
     await setDoc(doc(this.db, this.o, oId), {
       customerRef: doc(this.db, "customers", customerId),
       date: Timestamp.fromDate(date),
@@ -264,6 +281,7 @@ class Firebase {
       materialRef: doc(this.db, "materials", materialId),
       remark: remark,
       statusRef: doc(this.db, "status", statusId),
+      isVisible: isVisible,
     });
     for (const [vId, vInfo] of Object.entries(variationTrees)) {
       await this.setVariation({ [vId]: vInfo }, oId);

@@ -120,6 +120,12 @@ const Form = ({ firebase, modelUtil }) => {
     }
   };
 
+  const onDelete = async () => {
+    const orderId = modelUtil.getTreeId(order);
+    await firebase.deleteOrder(orderId);
+    history.push("/");
+  };
+
   const createChoiceIfAbsent = async (order, selections, choice) => {
     const selectionChoice = `${choice}s`;
     const choiceId = modelUtil.getTreeId(modelUtil.getTreeInfo(order, choice));
@@ -175,7 +181,9 @@ const Form = ({ firebase, modelUtil }) => {
                 isLoading={isSubmitting}
               />
             </div>
-            {isUpdate && <IconButton theme="error" Icon={TrashIcon} />}
+            {isUpdate && (
+              <IconButton theme="error" Icon={TrashIcon} onClick={onDelete} />
+            )}
           </div>
         </div>
       </div>

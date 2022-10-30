@@ -1,5 +1,3 @@
-import moment from "moment";
-
 class ModelUtil {
   constructor(firebase) {
     this.firebase = firebase;
@@ -78,6 +76,7 @@ class ModelUtil {
         status: status,
         variations: {},
         image: "",
+        isVisible: true,
       },
     };
   };
