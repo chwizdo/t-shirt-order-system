@@ -5,7 +5,7 @@ import TableRow from "../../components/TableRow";
 import TextButton from "../../components/TextButton";
 import TextField from "../../components/TextField";
 import {
-  Bars3Icon,
+  ArrowRightOnRectangleIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
   Cog6ToothIcon,
@@ -16,7 +16,7 @@ import { useHistory } from "react-router-dom";
 import { withFirebase } from "../../services/Firebase";
 
 const Home = ({ firebase }) => {
-  const onMenuClicked = () => firebase.logout();
+  const onLogoutClicked = () => firebase.logout();
   const onNewOrderClicked = () => history.push("/new");
   const onSettingClicked = () => history.push("/setting");
 
@@ -57,13 +57,18 @@ const Home = ({ firebase }) => {
         <div className="flex space-x-4 mb-4">
           <TextButton text="New Order" onClicked={onNewOrderClicked} />
           <div className="flex-1">
-            <TextField
+            {/* <TextField
               placeholder="Search"
               value={query}
               onChanged={setQuery}
-            />
+            /> */}
           </div>
           <IconButton Icon={Cog6ToothIcon} onClick={onSettingClicked} />
+          <IconButton
+            theme="error"
+            Icon={ArrowRightOnRectangleIcon}
+            onClick={onLogoutClicked}
+          />
         </div>
 
         {/* Filters */}
@@ -109,13 +114,13 @@ const Home = ({ firebase }) => {
 
         {/* Pagination */}
 
-        <div className="flex space-x-4 justify-end">
+        {/* <div className="flex space-x-4 justify-end">
           <IconButton Icon={ChevronDoubleLeftIcon} theme="light" />
           <NumberButton number="1" selected={true} />
           <NumberButton number="2" />
           <NumberButton number="3" />
           <IconButton Icon={ChevronDoubleRightIcon} theme="light" />
-        </div>
+        </div> */}
       </div>
     </div>
   );
