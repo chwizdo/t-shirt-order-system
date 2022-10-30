@@ -38,7 +38,7 @@ const SettingItem = ({
         <IconButton theme="error" Icon={XMarkIcon} onClick={exitEditMode} />
         <div className="flex-1">
           <TextField
-            placeholder=""
+            placeholder="Edit entry"
             value={name}
             onChanged={(newName) => setName(newName)}
           />
