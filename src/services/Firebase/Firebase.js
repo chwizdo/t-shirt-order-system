@@ -162,7 +162,7 @@ class Firebase {
         remark: this.getSingleValue(orderDoc, "remark"),
         status: await this.getReferenceValue(orderDoc, "statusRef"),
         variations: await this.getOrderVariations(orderDoc),
-        image: await this.getImageUrl(this.getSingleValue(orderDoc, "id")),
+        image: await this.getImageUrl(orderId),
       },
     };
   }

@@ -18,6 +18,9 @@ export default ({
       const filtered = { [query]: { name: query } };
       for (const key in list) {
         if (!isMatched(list[key].name, query)) continue;
+        if (list[key].name.toLowerCase() === query.toLowerCase()) {
+          delete filtered[query];
+        }
         filtered[key] = list[key];
       }
       setFiltered(filtered);

@@ -57,9 +57,25 @@ const Form = ({ firebase, modelUtil }) => {
   };
 
   const validate = (order) => {
+    // validate customer.
+    const customer = modelUtil.getTreeInfo(order, "customer");
+    if (!customer) return "Customer field is empty";
+
+    // validate designer.
+    const designer = modelUtil.getTreeInfo(order, "designer");
+    if (!designer) return "Designer field is empty";
+
+    // validate material.
+    const material = modelUtil.getTreeInfo(order, "material");
+    if (!material) return "Material field is empty";
+
     // validate design.
     const design = modelUtil.getTreeInfo(order, "design");
     if (!design) return "Invalid design name";
+
+    // validate image.
+    const image = modelUtil.getTreeInfo(order, "image");
+    if (!image) return "Image field is empty";
 
     // validate date.
     const date = modelUtil.getTreeInfo(order, "date");

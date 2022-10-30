@@ -83,7 +83,7 @@ const FormDetail = ({ order, setOrder, modelUtil, selections, firebase }) => {
             onChange={async (e) => {
               if (!e.target.files || e.target.files.length === 0) return;
               setIsUploading(true);
-              const id = modelUtil.getTreeInfo(order, "id");
+              const id = modelUtil.getTreeId(order);
               await firebase.uploadImage(e.target.files[0], id);
               const image = await firebase.getImageUrl(id);
               const o = modelUtil.updateTreeInfo(order, "image", image);
