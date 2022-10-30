@@ -69,13 +69,13 @@ const FormSize = ({ modelUtil, order, setOrder, variation, selections }) => {
           </span>
         </div>
         <div className="space-y-4">
-          {Object.keys(selections.sizes).map((sId) => (
+          {Object.keys(selections.sizes).map((sId, sIdx) => (
             <TextButton
               key={sId}
               theme="light"
               text={selections.sizes[sId].name}
               onClicked={() => {
-                const sizeId = Object.keys(selections.sizes)[0];
+                const sizeId = Object.keys(selections.sizes)[sIdx];
 
                 const s = modelUtil.getEmptySize({
                   [sizeId]: selections.sizes[sizeId],
