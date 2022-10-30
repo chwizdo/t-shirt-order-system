@@ -160,6 +160,12 @@ class Firebase {
     await updateDoc(doc(this.db, this.o, oId), { isVisible: false });
   };
 
+  updateOrderStatus = async (oId, statusId) => {
+    await updateDoc(doc(this.db, this.o, oId), {
+      statusRef: doc(this.db, "status", statusId),
+    });
+  };
+
   // Get a single full order details.
   async getOrder(orderId) {
     const orderDoc = await getDoc(doc(this.db, "orders", orderId));

@@ -9,8 +9,9 @@ import {
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { withFirebase } from "../../services/Firebase";
+import { withModelUtil } from "../../services/ModelUtil";
 
-const Home = ({ firebase }) => {
+const Home = ({ firebase, modelUtil }) => {
   const onLogoutClicked = () => firebase.logout();
   const onNewOrderClicked = () => history.push("/new");
   const onSettingClicked = () => history.push("/setting");
@@ -94,6 +95,8 @@ const Home = ({ firebase }) => {
 
           <div className="space-y-4">
             {Object.keys(summaries).map((id) => {
+              const summary = { [id]: summaries[id] };
+
               return (
                 <TableRow
                   key={id}
@@ -101,6 +104,20 @@ const Home = ({ firebase }) => {
                   order={summaries[id]}
                   status={status}
                   onEntryClicked={() => history.push(`/${id}`)}
+                  onStatusChanged={async (statusId) => {
+                    const summariesCopy = { ...summaries };
+                    const summaryCopy = { ...summary };
+                    await firebase.updateOrderStatus(
+                      modelUtil.getTreeId(summaryCopy),
+                      statusId
+                    );
+                    summariesCopy[id] = modelUtil.getTreeInfos(
+                      modelUtil.updateTreeInfo(summaryCopy, "status", {
+                        [statusId]: status[statusId],
+                      })
+                    );
+                    setSummaries(summariesCopy);
+                  }}
                 />
               );
             })}
@@ -121,4 +138,4 @@ const Home = ({ firebase }) => {
   );
 };
 
-export default withFirebase(Home);
+export default withModelUtil(withFirebase(Home));

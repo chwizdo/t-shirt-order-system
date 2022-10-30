@@ -81,14 +81,33 @@ const Form = ({ firebase, modelUtil }) => {
     const date = modelUtil.getTreeInfo(order, "date");
     if (!date) return "Invalid date";
 
-    // validate print quantity.
     const variationTrees = modelUtil.getTreeInfo(order, "variations");
     for (const vId in variationTrees) {
+      // validate sleeve.
+      console.log(variationTrees[vId]);
+      const sleeve = modelUtil.getTreeInfo(
+        { [vId]: variationTrees[vId] },
+        "sleeve"
+      );
+      console.log(sleeve);
+      if (!sleeve) return "Sleeve field is empty";
+
+      // validate collar.
+      const collar = modelUtil.getTreeInfo(
+        { [vId]: variationTrees[vId] },
+        "collar"
+      );
+      if (!collar) return "Collar field is empty";
+
       const sizeTrees = modelUtil.getTreeInfo(variationTrees[vId], "sizes");
       for (const sId in sizeTrees) {
         const printTrees = modelUtil.getTreeInfo(sizeTrees[sId], "prints");
         for (const pId in printTrees) {
-          const quantity = modelUtil.getTreeInfo(printTrees[pId], "quantity");
+          // validate print quantity.
+          const quantity = modelUtil.getTreeInfo(
+            { [pId]: printTrees[pId] },
+            "quantity"
+          );
           if (isNaN(parseInt(quantity))) return "Invalid quantity";
         }
       }

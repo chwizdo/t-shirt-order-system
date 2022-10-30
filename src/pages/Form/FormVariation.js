@@ -98,15 +98,11 @@ const FormVariation = ({ modelUtil, order, setOrder, selections }) => {
           theme="light"
           text="Add New Variation"
           onClicked={() => {
-            const collarId = Object.keys(selections.collars)[0];
-            const sleeveId = Object.keys(selections.sleeves)[0];
             const sizeId = Object.keys(selections.sizes)[0];
 
-            const v = modelUtil.getEmptyVariation(
-              { [collarId]: selections.collars[collarId] },
-              { [sleeveId]: selections.sleeves[sleeveId] },
-              { [sizeId]: selections.sizes[sizeId] }
-            );
+            const v = modelUtil.getEmptyVariation(null, null, {
+              [sizeId]: selections.sizes[sizeId],
+            });
             const o = modelUtil.updateSubTree(order, "variations", v);
             setOrder(o);
           }}
