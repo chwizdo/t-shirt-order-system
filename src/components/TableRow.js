@@ -17,7 +17,9 @@ export default ({
         <div className="w-20">{order.id}</div>
         <div className="w-24">{moment(order.date).format("YYYY-MM-DD")}</div>
         <div className="flex-1 min-w-0 truncate">
-          {Object.values(order.customer)[0].name}
+          {order.customer
+            ? Object.values(order.customer)[0].name
+            : "No customer specified"}
         </div>
       </div>
 

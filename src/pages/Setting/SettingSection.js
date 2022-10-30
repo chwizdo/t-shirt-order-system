@@ -7,7 +7,8 @@ const SettingSection = ({
   addButtonText = "Text",
   onAddButtonClicked = () => {},
   trees = {},
-  onEditHandler = () => {},
+  onEditHandler = async () => {},
+  onRemoveHandler = async () => {},
   modelUtil,
 }) => {
   return (
@@ -27,6 +28,7 @@ const SettingSection = ({
               id={id}
               name={name}
               onEditHandler={onEditHandler}
+              onRemoveHandler={onRemoveHandler}
             />
           );
         })}

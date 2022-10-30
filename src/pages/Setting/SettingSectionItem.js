@@ -28,7 +28,7 @@ const SettingItem = ({
     await onEditHandler(id, name);
     exitEditMode();
   };
-  const remove = async () => await onRemoveHandler();
+  const remove = async () => await onRemoveHandler(id);
 
   useEffect(() => setName(initialName), [initialName]);
 
@@ -50,7 +50,7 @@ const SettingItem = ({
 
   return (
     <div className="flex space-x-4">
-      <IconButton theme="error-light" Icon={MinusIcon} />
+      <IconButton theme="error-light" Icon={MinusIcon} onClick={remove} />
       <div className="h-13 border-2 border-grey rounded-lg px-6 flex items-center flex-1">
         {name}
       </div>

@@ -19,6 +19,7 @@ import {
   orderBy,
   query,
   limit,
+  deleteDoc,
 } from "firebase/firestore";
 import ModelUtil from "../ModelUtil";
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
@@ -111,6 +112,10 @@ class Firebase {
 
   setChoice = async (choice, id, name) => {
     await setDoc(doc(this.db, choice, id), { name: name });
+  };
+
+  deleteChoice = async (choice, id) => {
+    await deleteDoc(doc(this.db, choice, id));
   };
 
   // Get order summaries to populate home page.
@@ -219,7 +224,7 @@ class Firebase {
   async getReferenceValue(doc, key) {
     if (!doc.data()[key]) return null;
     const nestedDoc = await getDoc(doc.data()[key]);
-    if (!nestedDoc.exists) return null;
+    if (!nestedDoc.exists()) return null;
     return { [nestedDoc.id]: { name: nestedDoc.data().name || null } };
   }
 

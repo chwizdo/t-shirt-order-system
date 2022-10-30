@@ -6,6 +6,7 @@ class ModelUtil {
   }
 
   getTreeId = (tree) => {
+    if (!tree) return null;
     const treeCopy = { ...tree };
     return Object.keys(treeCopy)[0];
   };
@@ -16,6 +17,8 @@ class ModelUtil {
   };
 
   getTreeInfo = (tree, name) => {
+    console.log(tree);
+    if (!tree) return null;
     const treeCopy = { ...tree };
     return Object.values(treeCopy)[0][name];
   };
