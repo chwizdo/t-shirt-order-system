@@ -17,7 +17,6 @@ class ModelUtil {
   };
 
   getTreeInfo = (tree, name) => {
-    console.log(tree);
     if (!tree) return null;
     const treeCopy = { ...tree };
     return Object.values(treeCopy)[0][name];
@@ -67,28 +66,13 @@ class ModelUtil {
     },
   });
 
-  getNewOrderId = async () => {
-    const lastId = await this.firebase.getLatestOrderId();
-    let newId = moment(new Date()).format("YYMMDD");
-    if (lastId != null && lastId.startsWith(newId)) {
-      const lastCount = lastId.split(newId)[1];
-      const newCount = parseInt(lastCount) + 1;
-      newId += newCount;
-    } else {
-      newId += "1";
-    }
-    return newId;
-  };
-
   getEmptyOrder = async (customer, designer, material, status) => {
-    const orderId = await this.getNewOrderId();
     return {
       [this.firebase.generateDocId()]: {
         customer: customer,
         date: new Date(),
         design: "",
         designer: designer,
-        id: orderId,
         material: material,
         remark: "",
         status: status,

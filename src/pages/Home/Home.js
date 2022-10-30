@@ -93,13 +93,14 @@ const Home = ({ firebase }) => {
           {/* Table Rows */}
 
           <div className="space-y-4">
-            {Object.keys(summaries).map((key) => {
+            {Object.keys(summaries).map((id) => {
               return (
                 <TableRow
-                  key={summaries[key].id}
-                  order={summaries[key]}
+                  key={id}
+                  id={id}
+                  order={summaries[id]}
                   status={status}
-                  onEntryClicked={() => history.push(`/${key}`)}
+                  onEntryClicked={() => history.push(`/${id}`)}
                 />
               );
             })}

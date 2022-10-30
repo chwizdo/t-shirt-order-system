@@ -16,9 +16,6 @@ import {
   getDoc,
   Timestamp,
   setDoc,
-  orderBy,
-  query,
-  limit,
   deleteDoc,
 } from "firebase/firestore";
 import ModelUtil from "../ModelUtil";
@@ -130,7 +127,6 @@ class Firebase {
       summaries[orderDoc.id] = {
         customer: await this.getReferenceValue(orderDoc, "customerRef"),
         date: this.getSingleDate(orderDoc),
-        id: this.getSingleValue(orderDoc, "id"),
         status: await this.getReferenceValue(orderDoc, "statusRef"),
       };
     }
@@ -162,7 +158,6 @@ class Firebase {
         date: this.getSingleDate(orderDoc),
         design: this.getSingleValue(orderDoc, "design"),
         designer: await this.getReferenceValue(orderDoc, "designerRef"),
-        id: this.getSingleValue(orderDoc, "id"),
         material: await this.getReferenceValue(orderDoc, "materialRef"),
         remark: this.getSingleValue(orderDoc, "remark"),
         status: await this.getReferenceValue(orderDoc, "statusRef"),
@@ -259,7 +254,6 @@ class Firebase {
     const statusId = this.modelUtil.getTreeId(status);
     const design = this.modelUtil.getTreeInfo(orderTree, "design");
     const date = this.modelUtil.getTreeInfo(orderTree, "date");
-    const id = this.modelUtil.getTreeInfo(orderTree, "id");
     const remark = this.modelUtil.getTreeInfo(orderTree, "remark");
     const variationTrees = this.modelUtil.getTreeInfo(orderTree, "variations");
     await setDoc(doc(this.db, this.o, oId), {
@@ -267,13 +261,11 @@ class Firebase {
       date: Timestamp.fromDate(date),
       design: design,
       designerRef: doc(this.db, "designers", designerId),
-      id: id,
       materialRef: doc(this.db, "materials", materialId),
       remark: remark,
       statusRef: doc(this.db, "status", statusId),
     });
     for (const [vId, vInfo] of Object.entries(variationTrees)) {
-      console.log(vId);
       await this.setVariation({ [vId]: vInfo }, oId);
     }
   };
@@ -320,13 +312,6 @@ class Firebase {
       { name: name, number: number, quantity: quantity }
     );
   };
-
-  async getLatestOrderId() {
-    const q = query(collection(this.db, "orders"), orderBy("date"), limit(1));
-    const docs = (await getDocs(q)).docs;
-    if (docs.length <= 0) return null;
-    return docs[0].data().id;
-  }
 }
 
 export default Firebase;

@@ -35,16 +35,10 @@ const Form = ({ firebase, modelUtil }) => {
     if (orderId) {
       setOrder(await firebase.getOrder(orderId));
     } else {
-      const customerId = Object.keys(selections.customers)[0];
-      const designerId = Object.keys(selections.designers)[0];
-      const materialId = Object.keys(selections.materials)[0];
       const statusId = Object.keys(selections.status)[0];
-      const emptyOrder = await modelUtil.getEmptyOrder(
-        { [customerId]: selections.customers[customerId] },
-        { [designerId]: selections.designers[designerId] },
-        { [materialId]: selections.materials[materialId] },
-        { [statusId]: selections.status[statusId] }
-      );
+      const emptyOrder = await modelUtil.getEmptyOrder(null, null, null, {
+        [statusId]: selections.status[statusId],
+      });
       setOrder(emptyOrder);
     }
     setIsLoading(false);
@@ -95,12 +89,34 @@ const Form = ({ firebase, modelUtil }) => {
     try {
       const orderId = modelUtil.getTreeId(order);
       setIsSubmitting(true);
+
+      await createChoiceIfAbsent(order, selections, "customer");
+      await createChoiceIfAbsent(order, selections, "designer");
+      await createChoiceIfAbsent(order, selections, "material");
+
       await firebase.setOrder(order);
       setIsSubmitting(false);
       history.push(`/${orderId}`);
     } catch (e) {
+      console.log(e);
       setIsSubmitting(false);
       setError("Unknown error");
+    }
+  };
+
+  const createChoiceIfAbsent = async (order, selections, choice) => {
+    const selectionChoice = `${choice}s`;
+    const choiceId = modelUtil.getTreeId(modelUtil.getTreeInfo(order, choice));
+    if (!selections[selectionChoice][choiceId]) {
+      const docId = firebase.generateDocId();
+      await firebase.createChoice(selectionChoice, docId, choiceId);
+      const o = modelUtil.updateTreeInfo(order, choice, {
+        [docId]: { name: choiceId },
+      });
+      const selectionsCopy = { ...selections };
+      selectionsCopy[selectionChoice][docId] = { name: choiceId };
+      setSelections(selectionsCopy);
+      setOrder(o);
     }
   };
 
@@ -121,7 +137,7 @@ const Form = ({ firebase, modelUtil }) => {
           <span className="leading-tight underline">Back to Homepage</span>
         </Link>
         <div className="text-xl leading-tight mb-12">
-          {modelUtil.getTreeInfo(order, "id")}
+          ORDER ID: {modelUtil.getTreeId(order)}
         </div>
         <FormDetail order={order} setOrder={setOrder} selections={selections} />
         <FormVariation

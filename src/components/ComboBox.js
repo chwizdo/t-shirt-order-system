@@ -15,7 +15,7 @@ export default ({
     if (query === "") {
       setFiltered(list);
     } else {
-      const filtered = {};
+      const filtered = { [query]: { name: query } };
       for (const key in list) {
         if (!isMatched(list[key].name, query)) continue;
         filtered[key] = list[key];
@@ -38,7 +38,7 @@ export default ({
           <div className="relative">
             <Combobox.Input
               className="w-full border-2 border-grey h-13 pl-6 pr-14 rounded-lg leading-tight text-black outline-none focus:border-black transition"
-              displayValue={(key) => key && list[key].name}
+              displayValue={(key) => key && filtered[key].name}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={placeholder}
             />
