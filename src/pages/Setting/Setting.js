@@ -52,6 +52,16 @@ const Setting = ({ firebase, modelUtil }) => {
     };
   };
 
+  const getOnAddHandler = (choice, tree, setTree) => {
+    return async (name) => {
+      const id = firebase.generateDocId();
+      await firebase.createChoice(choice, id, name);
+      const treeCopy = { ...tree };
+      treeCopy[id] = { name: name };
+      setTree(treeCopy);
+    };
+  };
+
   if (isLoading) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -71,7 +81,6 @@ const Setting = ({ firebase, modelUtil }) => {
         <SettingSection
           title="Customer"
           addButtonText="New customer"
-          onAddButtonClicked={() => {}}
           trees={customers}
           onEditHandler={getOnEditHandler("customers", customers, setCustomers)}
           onRemoveHandler={getOnRemoveHandler(
@@ -79,12 +88,13 @@ const Setting = ({ firebase, modelUtil }) => {
             customers,
             setCustomers
           )}
+          onAddHandler={getOnAddHandler("customers", customers, setCustomers)}
         />
         <SettingSection
           title="Collar"
           addButtonText="New collar"
-          onAddButtonClicked={() => {}}
           trees={collars}
+          onAddHandler={() => {}}
           onEditHandler={getOnEditHandler("collars", collars, setCollars)}
           onRemoveHandler={getOnRemoveHandler("collars", collars, setCollars)}
         />

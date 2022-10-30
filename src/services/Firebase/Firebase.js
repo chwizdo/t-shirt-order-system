@@ -118,6 +118,10 @@ class Firebase {
     await deleteDoc(doc(this.db, choice, id));
   };
 
+  createChoice = async (choice, id, name) => {
+    await setDoc(doc(this.db, choice, id), { name: name });
+  };
+
   // Get order summaries to populate home page.
   async getSummaries() {
     const orderDocs = (await getDocs(collection(this.db, "orders"))).docs;

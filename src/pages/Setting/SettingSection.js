@@ -9,8 +9,8 @@ import IconButton from "../../components/IconButton";
 const SettingSection = ({
   title = "Title",
   addButtonText = "Text",
-  onAddButtonClicked: onAddHandler = () => {},
   trees = {},
+  onAddHandler = async () => {},
   onEditHandler = async () => {},
   onRemoveHandler = async () => {},
   modelUtil,
@@ -18,9 +18,7 @@ const SettingSection = ({
   const [isCreateMode, setIsCreateMode] = useState(false);
   const [name, setName] = useState("");
 
-  const onAddButtonClicked = () => {
-    setIsCreateMode(true);
-  };
+  const onAddButtonClicked = () => enterCreateMode();
 
   const exitCreateMode = () => {
     setName("");
@@ -28,6 +26,12 @@ const SettingSection = ({
   };
 
   const enterCreateMode = () => setIsCreateMode(true);
+
+  const create = async () => {
+    if (!name) return;
+    await onAddHandler(name);
+    exitCreateMode();
+  };
 
   return (
     <div className="mb-12">
@@ -51,7 +55,7 @@ const SettingSection = ({
                 onChanged={(newName) => setName(newName)}
               />
             </div>
-            <IconButton theme="dark" Icon={CheckIcon} />
+            <IconButton theme="dark" Icon={CheckIcon} onClick={create} />
           </div>
         )}
         {Object.entries(trees).map(([id, infos]) => {
