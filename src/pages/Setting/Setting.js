@@ -9,7 +9,6 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
-import IconButton from "../../components/IconButton";
 import { withFirebase } from "../../services/Firebase";
 import { withModelUtil } from "../../services/ModelUtil";
 import SettingSection from "./SettingSection";
@@ -35,6 +34,15 @@ const Setting = ({ firebase, modelUtil }) => {
     setIsLoading(false);
   };
 
+  const getOnEditHandler = (choice, tree, setTree) => {
+    return async (id, name) => {
+      await firebase.setChoice(choice, id, name);
+      const treeCopy = { ...tree };
+      treeCopy[id] = { name: name };
+      setTree(treeCopy);
+    };
+  };
+
   if (isLoading) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -53,20 +61,17 @@ const Setting = ({ firebase, modelUtil }) => {
         </Link>
         <SettingSection
           title="Customer"
-          addText="New customer"
-          tree={customers}
-        />
-        <SettingSection title="Sleeve" addText="New sleeve" tree={sleeves} />
-        <SettingSection title="Collar" addText="New collar" tree={collars} />
-        <SettingSection
-          title="Material"
-          addText="New material"
-          tree={materials}
+          addButtonText="New customer"
+          onAddButtonClicked={() => {}}
+          trees={customers}
+          onEditHandler={getOnEditHandler("customers", customers, setCustomers)}
         />
         <SettingSection
-          title="Designer"
-          addText="New designer"
-          tree={designers}
+          title="Collar"
+          addButtonText="New collar"
+          onAddButtonClicked={() => {}}
+          trees={collars}
+          onEditHandler={getOnEditHandler("collars", collars, setCollars)}
         />
       </div>
     </div>
