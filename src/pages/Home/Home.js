@@ -100,7 +100,7 @@ const Home = ({ firebase, modelUtil }) => {
               return (
                 <TableRow
                   key={id}
-                  id={id}
+                  id={modelUtil.getTreeInfo(summary, "id")}
                   order={summaries[id]}
                   status={status}
                   onEntryClicked={() => history.push(`/${id}`)}

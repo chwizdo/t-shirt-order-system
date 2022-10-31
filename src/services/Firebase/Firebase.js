@@ -135,6 +135,7 @@ class Firebase {
         customer: await this.getReferenceValue(orderDoc, "customerRef"),
         date: this.getSingleDate(orderDoc),
         status: await this.getReferenceValue(orderDoc, "statusRef"),
+        id: this.getSingleValue(orderDoc, "id"),
       };
     }
     return summaries;
@@ -181,6 +182,7 @@ class Firebase {
         variations: await this.getOrderVariations(orderDoc),
         image: await this.getImageUrl(orderId),
         isVisible: this.getSingleBoolean(orderDoc, "isVisible"),
+        id: this.getSingleValue(orderDoc, "id"),
       },
     };
   }
@@ -264,6 +266,18 @@ class Firebase {
 
   generateDocId = () => doc(collection(this.db, "orders")).id;
 
+  getCount = async () => {
+    return (
+      await getDoc(doc(this.db, "systems", "SekuIwCyjvSRTNJvOu5L"))
+    ).data().count;
+  };
+
+  incrementCount = async () => {
+    await updateDoc(doc(this.db, "systems", "SekuIwCyjvSRTNJvOu5L"), {
+      count: (await this.getCount()) + 1,
+    });
+  };
+
   setOrder = async (orderTree) => {
     const oId = this.modelUtil.getTreeId(orderTree);
     const customer = this.modelUtil.getTreeInfo(orderTree, "customer");
@@ -279,6 +293,7 @@ class Firebase {
     const remark = this.modelUtil.getTreeInfo(orderTree, "remark");
     const variationTrees = this.modelUtil.getTreeInfo(orderTree, "variations");
     const isVisible = this.modelUtil.getTreeInfo(orderTree, "isVisible");
+    const id = this.modelUtil.getTreeInfo(orderTree, "id");
     await setDoc(doc(this.db, this.o, oId), {
       customerRef: doc(this.db, "customers", customerId),
       date: Timestamp.fromDate(date),
@@ -288,6 +303,7 @@ class Firebase {
       remark: remark,
       statusRef: doc(this.db, "status", statusId),
       isVisible: isVisible,
+      id: id,
     });
     for (const [vId, vInfo] of Object.entries(variationTrees)) {
       await this.setVariation({ [vId]: vInfo }, oId);

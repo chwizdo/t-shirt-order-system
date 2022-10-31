@@ -130,6 +130,8 @@ const Form = ({ firebase, modelUtil }) => {
       await createChoiceIfAbsent(order, selections, "material");
 
       await firebase.setOrder(order);
+      if (!isUpdate) await firebase.incrementCount();
+
       setIsSubmitting(false);
       history.push(`/${orderId}`);
     } catch (e) {
@@ -178,7 +180,7 @@ const Form = ({ firebase, modelUtil }) => {
           <span className="leading-tight underline">Back to Homepage</span>
         </Link>
         <div className="text-xl leading-tight mb-12">
-          ORDER ID: {modelUtil.getTreeId(order)}
+          ORDER ID: {modelUtil.getTreeInfo(order, "id")}
         </div>
         <FormDetail order={order} setOrder={setOrder} selections={selections} />
         <FormVariation

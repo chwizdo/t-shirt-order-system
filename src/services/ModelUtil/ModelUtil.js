@@ -77,6 +77,7 @@ class ModelUtil {
         variations: {},
         image: "",
         isVisible: true,
+        id: (await this.firebase.getCount()) + 1,
       },
     };
   };
