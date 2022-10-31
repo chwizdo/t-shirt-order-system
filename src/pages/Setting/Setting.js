@@ -20,6 +20,7 @@ const Setting = ({ firebase, modelUtil }) => {
   const [materials, setMaterials] = useState({});
   const [sleeves, setSleeves] = useState({});
   const [collars, setCollars] = useState({});
+  const [sizes, setSizes] = useState({});
 
   useEffect(() => {
     getInitialData();
@@ -31,6 +32,7 @@ const Setting = ({ firebase, modelUtil }) => {
     setMaterials(await firebase.getChoices("materials"));
     setSleeves(await firebase.getChoices("sleeves"));
     setCollars(await firebase.getChoices("collars"));
+    setSizes(await firebase.getChoices("sizes"));
     setIsLoading(false);
   };
 
@@ -129,6 +131,14 @@ const Setting = ({ firebase, modelUtil }) => {
             setDesigners
           )}
           onAddHandler={getOnAddHandler("designers", designers, setDesigners)}
+        />
+        <SettingSection
+          title="Size"
+          addButtonText="New size"
+          trees={sizes}
+          onEditHandler={getOnEditHandler("sizes", sizes, setSizes)}
+          onRemoveHandler={getOnRemoveHandler("sizes", sizes, setSizes)}
+          onAddHandler={getOnAddHandler("sizes", sizes, setSizes)}
         />
       </div>
     </div>
