@@ -2,13 +2,15 @@ import IconButton from "./IconButton";
 import SelectBox from "./SelectBox";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import moment from "moment";
+import { withModelUtil } from "../services/ModelUtil";
 
-export default ({
+const TableRow = ({
   id,
   order,
   status,
   onEntryClicked = () => {},
   onStatusChanged = () => {},
+  modelUtil,
 }) => {
   return (
     <div className="flex space-x-4">
@@ -29,7 +31,7 @@ export default ({
       <div className="w-[162px]">
         <SelectBox
           list={status}
-          value={Object.keys(order.status)[0]}
+          value={modelUtil.getTreeId(modelUtil.getTreeInfo(order.status))}
           onChanged={onStatusChanged}
         />
       </div>
@@ -42,3 +44,5 @@ export default ({
     </div>
   );
 };
+
+export default withModelUtil(TableRow);

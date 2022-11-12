@@ -21,6 +21,7 @@ const Setting = ({ firebase, modelUtil }) => {
   const [sleeves, setSleeves] = useState({});
   const [collars, setCollars] = useState({});
   const [sizes, setSizes] = useState({});
+  const [status, setStatus] = useState({});
 
   useEffect(() => {
     getInitialData();
@@ -33,6 +34,7 @@ const Setting = ({ firebase, modelUtil }) => {
     setSleeves(await firebase.getChoices("sleeves"));
     setCollars(await firebase.getChoices("collars"));
     setSizes(await firebase.getChoices("sizes"));
+    setStatus(await firebase.getChoices("status"));
     setIsLoading(false);
   };
 
@@ -139,6 +141,14 @@ const Setting = ({ firebase, modelUtil }) => {
           onEditHandler={getOnEditHandler("sizes", sizes, setSizes)}
           onRemoveHandler={getOnRemoveHandler("sizes", sizes, setSizes)}
           onAddHandler={getOnAddHandler("sizes", sizes, setSizes)}
+        />
+        <SettingSection
+          title="Status"
+          addButtonText="New status"
+          trees={status}
+          onEditHandler={getOnEditHandler("status", status, setStatus)}
+          onRemoveHandler={getOnRemoveHandler("status", status, setStatus)}
+          onAddHandler={getOnAddHandler("status", status, setStatus)}
         />
       </div>
     </div>
