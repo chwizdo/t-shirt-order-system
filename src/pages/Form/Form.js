@@ -191,9 +191,16 @@ const Form = ({ firebase, modelUtil }) => {
         <div className="space-y-4">
           {error && <MessageBox message={`Error: ${error}`} type="error" />}
           <div className="flex-1 flex space-x-4">
-            <div className="flex-1">
-              <TextButton theme="light" text="Preview PDF" />
-            </div>
+            {isUpdate && (
+              <Link
+                className="flex-1"
+                to={`/${orderId}/pdf`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <TextButton theme="light" text="Preview PDF" />
+              </Link>
+            )}
             <div className="flex-1">
               <TextButton
                 theme="dark"
