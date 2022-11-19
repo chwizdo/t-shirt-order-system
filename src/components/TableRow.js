@@ -18,11 +18,14 @@ const TableRow = ({
 
       <div className="flex flex-1 min-w-0 border-2 border-grey rounded-lg h-13 px-6 items-center space-x-8">
         <div className="w-20 truncate">{id}</div>
-        <div className="w-24">{moment(order.date).format("YYYY-MM-DD")}</div>
+        <div className="w-24">
+          {moment(modelUtil.getTreeInfo(order, "date")).format("YYYY-MM-DD")}
+        </div>
         <div className="flex-1 min-w-0 truncate">
-          {order.customer
-            ? Object.values(order.customer)[0].name
-            : "No customer specified"}
+          {modelUtil.getTreeInfo(
+            modelUtil.getTreeInfo(order, "customer"),
+            "name"
+          ) || "No Customer specified"}
         </div>
       </div>
 
@@ -31,7 +34,7 @@ const TableRow = ({
       <div className="w-[162px]">
         <SelectBox
           list={status}
-          value={modelUtil.getTreeId(modelUtil.getTreeInfo(order.status))}
+          value={modelUtil.getTreeId(modelUtil.getTreeInfo(order, "status"))}
           onChanged={onStatusChanged}
         />
       </div>

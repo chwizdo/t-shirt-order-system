@@ -101,7 +101,7 @@ const Home = ({ firebase, modelUtil }) => {
                 <TableRow
                   key={id}
                   id={modelUtil.getTreeInfo(summary, "id")}
-                  order={summaries[id]}
+                  order={summary}
                   status={status}
                   onEntryClicked={() => history.push(`/${id}`)}
                   onStatusChanged={async (statusId) => {
