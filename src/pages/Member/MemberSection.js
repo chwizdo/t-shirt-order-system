@@ -5,10 +5,12 @@ import { withFirebase } from "../../services/Firebase";
 
 const MemberSection = ({
   title = "Title",
+  showAddButton = true,
   addButtonText = "Text",
   trees = {},
+  forIsActive = true,
   onAddHandler = async () => {},
-  onRemoveHandler = async () => {},
+  onItemClickHandler = async () => {},
   firebase,
   modelUtil,
 }) => {
@@ -16,6 +18,7 @@ const MemberSection = ({
     <div className="mb-12">
       <MemberSectionHeader
         title={title}
+        showAddButton={showAddButton}
         addButtonText={addButtonText}
         onAddButtonClicked={onAddHandler}
       />
@@ -31,7 +34,8 @@ const MemberSection = ({
               key={id}
               id={id}
               name={name}
-              onRemoveHandler={onRemoveHandler}
+              forIsActive={forIsActive}
+              onRemoveHandler={onItemClickHandler}
             />
           );
         })}

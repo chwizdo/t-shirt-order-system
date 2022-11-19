@@ -62,6 +62,8 @@ class Firebase {
           await setDoc(doc(this.db, "invitations", code), { isUsed: true });
           await setDoc(doc(this.db, "users", userCredential.user.uid), {
             email: userCredential.user.email,
+            isAdmin: false,
+            isActive: true,
           });
           return null;
         } else {
@@ -77,6 +79,14 @@ class Firebase {
 
   async login(email, password) {
     try {
+      const userDocs = (
+        await getDocs(
+          query(collection(this.db, "users"), where("email", "==", email))
+        )
+      ).docs;
+      if (userDocs.length === 1) {
+        if (!userDocs[0].data().isActive) return "Your account is suspended";
+      }
       await signInWithEmailAndPassword(this.auth, email, password);
     } catch (e) {
       return this.formatErrorCode(e.code);
@@ -89,6 +99,11 @@ class Firebase {
     } catch (e) {
       return this.formatErrorCode(e.code);
     }
+  }
+
+  async getIsAuth() {
+    const user = await getDoc(doc(this.db, "users", this.auth.currentUser.uid));
+    return user.data().isAdmin;
   }
 
   async updateName(user, name) {
@@ -126,9 +141,17 @@ class Firebase {
     const userDocs = (await getDocs(collection(this.db, "users"))).docs;
     const users = {};
     for (const userDoc of userDocs) {
-      users[userDoc.id] = { email: userDoc.data().email || null };
+      users[userDoc.id] = {
+        email: userDoc.data().email || null,
+        isAdmin: userDoc.data().isAdmin,
+        isActive: userDoc.data().isActive,
+      };
     }
     return users;
+  };
+
+  setMemberActiveStatus = async (id, isActive) => {
+    await updateDoc(doc(this.db, "users", id), { isActive: isActive });
   };
 
   setInvitation = async (id) => {

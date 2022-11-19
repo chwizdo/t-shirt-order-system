@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { withFirebase } from "../../services/Firebase";
 import Modal from "react-modal";
 import MemberProfile from "./MemberProfile";
+import { withModelUtil } from "../../services/ModelUtil";
 
 const customStyles = {
   content: {
@@ -17,12 +18,13 @@ const customStyles = {
   },
 };
 
-const Member = ({ firebase }) => {
+const Member = ({ firebase, modelUtil }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [members, setMembers] = useState({});
   const [modalIsOpen, setIsOpen] = useState(false);
   const [id, setId] = useState("");
   const [name, setName] = useState(firebase.auth.currentUser.displayName);
+  const [isAuth, setIsAuth] = useState(false);
 
   useEffect(() => {
     getInitialData();
@@ -30,6 +32,7 @@ const Member = ({ firebase }) => {
 
   const getInitialData = async () => {
     setMembers(await firebase.getMembers());
+    setIsAuth(await firebase.getIsAuth());
     setIsLoading(false);
   };
 
@@ -39,6 +42,30 @@ const Member = ({ firebase }) => {
     const id = firebase.generateDocId();
     setId(id);
     firebase.setInvitation(id);
+  };
+
+  const removeUser = async (id) => {
+    await firebase.setMemberActiveStatus(id, false);
+    const membersCopy = { ...members };
+    const member = modelUtil.updateTreeInfo(
+      { [id]: membersCopy[id] },
+      "isActive",
+      false
+    );
+    membersCopy[id] = member[id];
+    setMembers(membersCopy);
+  };
+
+  const addUser = async (id) => {
+    await firebase.setMemberActiveStatus(id, true);
+    const membersCopy = { ...members };
+    const member = modelUtil.updateTreeInfo(
+      { [id]: membersCopy[id] },
+      "isActive",
+      true
+    );
+    membersCopy[id] = member[id];
+    setMembers(membersCopy);
   };
 
   if (isLoading) {
@@ -65,19 +92,34 @@ const Member = ({ firebase }) => {
             setName(name);
           }}
         />
-        <MemberSection
-          title="Member"
-          addButtonText="New invitation code"
-          trees={members}
-          onRemoveHandler={(id) => console.log(`remove ${id}`)}
-          onAddHandler={openModal}
-          // onRemoveHandler={getOnRemoveHandler(
-          //   "customers",
-          //   customers,
-          //   setCustomers
-          // )}
-          // onAddHandler={getOnAddHandler("customers", customers, setCustomers)}
-        />
+        {isAuth && (
+          <MemberSection
+            title="Active Member"
+            addButtonText="New invitation code"
+            trees={Object.fromEntries(
+              Object.entries(members).filter(([id, infos]) => {
+                const member = { [id]: infos };
+                return modelUtil.getTreeInfo(member, "isActive");
+              })
+            )}
+            onItemClickHandler={removeUser}
+            onAddHandler={openModal}
+          />
+        )}
+        {isAuth && (
+          <MemberSection
+            title="Removed Member"
+            forIsActive={false}
+            showAddButton={false}
+            trees={Object.fromEntries(
+              Object.entries(members).filter(([id, infos]) => {
+                const member = { [id]: infos };
+                return !modelUtil.getTreeInfo(member, "isActive");
+              })
+            )}
+            onItemClickHandler={addUser}
+          />
+        )}
       </div>
       <Modal
         isOpen={modalIsOpen}
@@ -104,4 +146,4 @@ const Member = ({ firebase }) => {
   );
 };
 
-export default withFirebase(Member);
+export default withModelUtil(withFirebase(Member));
