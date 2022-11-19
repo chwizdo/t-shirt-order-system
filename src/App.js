@@ -23,6 +23,7 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import Pdf from "./pages/Pdf";
+import Member from "./pages/Member";
 
 const App = ({ firebase }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -58,6 +59,13 @@ const App = ({ firebase }) => {
             <Redirect to={{ pathname: "/login" }} />
           ) : (
             <Setting />
+          )}
+        </Route>
+        <Route path="/member">
+          {!isAuthenticated ? (
+            <Redirect to={{ pathname: "/login" }} />
+          ) : (
+            <Member />
           )}
         </Route>
         <Route path="/new">

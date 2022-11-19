@@ -5,6 +5,7 @@ import TextButton from "../../components/TextButton";
 import {
   ArrowRightOnRectangleIcon,
   Cog6ToothIcon,
+  UsersIcon,
 } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -15,6 +16,7 @@ const Home = ({ firebase, modelUtil }) => {
   const onLogoutClicked = () => firebase.logout();
   const onNewOrderClicked = () => history.push("/new");
   const onSettingClicked = () => history.push("/setting");
+  const onMemberClicked = () => history.push("/member");
 
   const [query, setQuery] = useState("");
   const [summaries, setSummaries] = useState({});
@@ -60,6 +62,7 @@ const Home = ({ firebase, modelUtil }) => {
             /> */}
           </div>
           <IconButton Icon={Cog6ToothIcon} onClick={onSettingClicked} />
+          <IconButton Icon={UsersIcon} onClick={onMemberClicked} />
           <IconButton
             theme="error"
             Icon={ArrowRightOnRectangleIcon}

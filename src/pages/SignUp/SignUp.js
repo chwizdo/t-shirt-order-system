@@ -39,7 +39,12 @@ const SignUp = ({ firebase }) => {
             onClicked={async () => {
               setError(null);
               setIsLoading(true);
-              const error = await firebase.signUp(name, email, password);
+              const error = await firebase.signUp(
+                name,
+                email,
+                password,
+                invitationCode
+              );
               setIsLoading(false);
               if (error) setError(error);
             }}

@@ -48,16 +48,28 @@ class Firebase {
     this.p = "prints";
   }
 
-  async signUp(name, email, password) {
+  async signUp(name, email, password, code) {
     try {
-      // TODO Check invitation code, mark as used.
-      const userCredential = await createUserWithEmailAndPassword(
-        this.auth,
-        email,
-        password
-      );
-      await updateProfile(userCredential.user, { displayName: name });
-      return null;
+      const invitation = await getDoc(doc(this.db, "invitations", code));
+      if (invitation.exists()) {
+        if (!invitation.data().isUsed) {
+          const userCredential = await createUserWithEmailAndPassword(
+            this.auth,
+            email,
+            password
+          );
+          await updateProfile(userCredential.user, { displayName: name });
+          await setDoc(doc(this.db, "invitations", code), { isUsed: true });
+          await setDoc(doc(this.db, "users", userCredential.user.uid), {
+            email: userCredential.user.email,
+          });
+          return null;
+        } else {
+          return "Invitation code is used";
+        }
+      } else {
+        return "Invalid invitation code";
+      }
     } catch (e) {
       return this.formatErrorCode(e.code);
     }
@@ -109,6 +121,19 @@ class Firebase {
     }
     return choices;
   }
+
+  getMembers = async () => {
+    const userDocs = (await getDocs(collection(this.db, "users"))).docs;
+    const users = {};
+    for (const userDoc of userDocs) {
+      users[userDoc.id] = { email: userDoc.data().email || null };
+    }
+    return users;
+  };
+
+  setInvitation = async (id) => {
+    await setDoc(doc(this.db, "invitations", id), { isUsed: false });
+  };
 
   setChoice = async (choice, id, name) => {
     await setDoc(doc(this.db, choice, id), { name: name });
