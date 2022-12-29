@@ -78,6 +78,7 @@ class ModelUtil {
         image: "",
         isVisible: true,
         id: (await this.firebase.getCount()) + 1,
+        link: "",
       },
     };
   };

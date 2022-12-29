@@ -48,7 +48,7 @@ const Form = ({ firebase, modelUtil }) => {
     const selections = {};
     selections["customers"] = await firebase.getChoices("customers");
     selections["designers"] = await firebase.getChoices("designers");
-    selections["sizes"] = await firebase.getChoices("sizes");
+    selections["sizes"] = await firebase.getSizes();
     selections["materials"] = await firebase.getChoices("materials");
     selections["status"] = await firebase.getChoices("status");
     selections["sleeves"] = await firebase.getChoices("sleeves");

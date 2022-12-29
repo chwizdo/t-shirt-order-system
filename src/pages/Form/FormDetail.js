@@ -72,6 +72,14 @@ const FormDetail = ({ order, setOrder, modelUtil, selections, firebase }) => {
             setOrder(o);
           }}
         />
+        <TextField
+          placeholder="Google Drive Link"
+          value={modelUtil.getTreeInfo(order, "link")}
+          onChanged={(value) => {
+            const o = modelUtil.updateTreeInfo(order, "link", value);
+            setOrder(o);
+          }}
+        />
       </div>
       <div className="w-64 space-y-4 flex flex-col">
         <div className="h-64 rounded-lg overflow-hidden border-2 border-grey">

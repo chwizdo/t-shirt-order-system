@@ -94,7 +94,7 @@ const Setting = ({ firebase, modelUtil }) => {
           )}
           onAddHandler={getOnAddHandler("customers", customers, setCustomers)}
         />
-        <SettingSection
+        {/* <SettingSection
           title="Collar"
           addButtonText="New collar"
           trees={collars}
@@ -149,7 +149,7 @@ const Setting = ({ firebase, modelUtil }) => {
           onEditHandler={getOnEditHandler("status", status, setStatus)}
           onRemoveHandler={getOnRemoveHandler("status", status, setStatus)}
           onAddHandler={getOnAddHandler("status", status, setStatus)}
-        />
+        /> */}
       </div>
     </div>
   );

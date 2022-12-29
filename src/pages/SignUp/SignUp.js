@@ -27,6 +27,7 @@ const SignUp = ({ firebase }) => {
             placeholder="Password"
             value={password}
             onChanged={setPassword}
+            type="password"
           />
           <TextField
             placeholder="Invitation Code"

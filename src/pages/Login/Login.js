@@ -24,6 +24,7 @@ const Login = ({ firebase }) => {
             placeholder="Password"
             value={password}
             onChanged={setPassword}
+            type="password"
           />
           <TextButton
             text="Login"

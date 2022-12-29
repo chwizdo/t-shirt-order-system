@@ -86,12 +86,15 @@ const Home = ({ firebase, modelUtil }) => {
           {/* Table Header */}
 
           <div className="flex mb-4">
-            <div className="flex flex-1 space-x-8 border-l-2 border-white px-6">
-              <div className="w-20">Order No</div>
-              <div className="w-24">Created At</div>
-              <div className="flex-1">Customer Name</div>
+            <div className="flex flex-1 space-x-8 border-l-2 border-white pr-6 pl-[92px] ">
+              <div className="w-12">No.</div>
+              <div className="w-[5.25rem] hidden md:block">Due Date</div>
+              <div className="flex-1">Design</div>
+              <div className="flex-1">Client</div>
             </div>
-            <div className="w-[230px] pl-6 border-l-2 border-white">Status</div>
+            <div className="w-[178px] pl-6 border-l-2 border-white hidden sm:block">
+              Status
+            </div>
           </div>
 
           {/* Table Rows */}

@@ -587,6 +587,10 @@ video {
   pointer-events: none;
 }
 
+.fixed {
+  position: fixed;
+}
+
 .absolute {
   position: absolute;
 }
@@ -613,6 +617,14 @@ video {
 
 .right-6 {
   right: 1.5rem;
+}
+
+.left-0 {
+  left: 0px;
+}
+
+.top-0 {
+  top: 0px;
 }
 
 .z-50 {
@@ -696,8 +708,8 @@ video {
   width: 3.25rem;
 }
 
-.w-20 {
-  width: 5rem;
+.w-16 {
+  width: 4rem;
 }
 
 .w-24 {
@@ -720,12 +732,32 @@ video {
   width: 104px;
 }
 
+.w-20 {
+  width: 5rem;
+}
+
 .w-\[230px\] {
   width: 230px;
 }
 
-.w-16 {
-  width: 4rem;
+.w-10 {
+  width: 2.5rem;
+}
+
+.w-12 {
+  width: 3rem;
+}
+
+.w-\[5\.5rem\] {
+  width: 5.5rem;
+}
+
+.w-\[5\.25rem\] {
+  width: 5.25rem;
+}
+
+.w-\[178px\] {
+  width: 178px;
 }
 
 .min-w-0 {
@@ -823,12 +855,12 @@ video {
   border-radius: 0.5rem;
 }
 
-.border-2 {
-  border-width: 2px;
-}
-
 .border {
   border-width: 1px;
+}
+
+.border-2 {
+  border-width: 2px;
 }
 
 .border-l-2 {
@@ -883,6 +915,11 @@ video {
   background-color: rgb(222 0 0 / var(--tw-bg-opacity));
 }
 
+.bg-red-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 202 202 / var(--tw-bg-opacity));
+}
+
 .object-cover {
   object-fit: cover;
 }
@@ -917,6 +954,14 @@ video {
 
 .pr-6 {
   padding-right: 1.5rem;
+}
+
+.pl-\[68px\] {
+  padding-left: 68px;
+}
+
+.pl-\[92px\] {
+  padding-left: 92px;
 }
 
 .text-left {
@@ -988,6 +1033,11 @@ video {
   outline-offset: 2px;
 }
 
+.filter {
+  -webkit-filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+          filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
 .transition {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, -webkit-transform, -webkit-filter, -webkit-backdrop-filter;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
@@ -1019,6 +1069,11 @@ video {
   background-color: rgb(54 54 54 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-light-grey:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(199 199 199 / var(--tw-bg-opacity));
+}
+
 .focus\:border-black:focus {
   --tw-border-opacity: 1;
   border-color: rgb(16 16 16 / var(--tw-border-opacity));
@@ -1037,4 +1092,16 @@ video {
 .active\:bg-black-hover:active {
   --tw-bg-opacity: 1;
   background-color: rgb(54 54 54 / var(--tw-bg-opacity));
+}
+
+@media (min-width: 640px) {
+  .sm\:block {
+    display: block;
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:block {
+    display: block;
+  }
 }

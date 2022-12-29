@@ -20,6 +20,7 @@ import {
   where,
   query,
   updateDoc,
+  orderBy,
 } from "firebase/firestore";
 import ModelUtil from "../ModelUtil";
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
@@ -137,6 +138,17 @@ class Firebase {
     return choices;
   }
 
+  async getSizes() {
+    const sizesDocs = (
+      await getDocs(query(collection(this.db, "sizes"), orderBy("order")))
+    ).docs;
+    const sizes = {};
+    for (const sizesDoc of sizesDocs) {
+      sizes[sizesDoc.id] = { name: sizesDoc.data().name || null };
+    }
+    return sizes;
+  }
+
   getMembers = async () => {
     const userDocs = (await getDocs(collection(this.db, "users"))).docs;
     const users = {};
@@ -184,6 +196,7 @@ class Firebase {
         date: this.getSingleDate(orderDoc),
         status: await this.getReferenceValue(orderDoc, "statusRef"),
         id: this.getSingleValue(orderDoc, "id"),
+        design: this.getSingleValue(orderDoc, "design"),
       };
     }
     return summaries;
@@ -231,6 +244,7 @@ class Firebase {
         image: await this.getImageUrl(orderId),
         isVisible: this.getSingleBoolean(orderDoc, "isVisible"),
         id: this.getSingleValue(orderDoc, "id"),
+        link: this.getSingleValue(orderDoc, "link"),
       },
     };
   }
@@ -342,6 +356,7 @@ class Firebase {
     const variationTrees = this.modelUtil.getTreeInfo(orderTree, "variations");
     const isVisible = this.modelUtil.getTreeInfo(orderTree, "isVisible");
     const id = this.modelUtil.getTreeInfo(orderTree, "id");
+    const link = this.modelUtil.getTreeInfo(orderTree, "link");
     await setDoc(doc(this.db, this.o, oId), {
       customerRef: doc(this.db, "customers", customerId),
       date: Timestamp.fromDate(date),
@@ -352,6 +367,7 @@ class Firebase {
       statusRef: doc(this.db, "status", statusId),
       isVisible: isVisible,
       id: id,
+      link: link,
     });
     for (const [vId, vInfo] of Object.entries(variationTrees)) {
       await this.setVariation({ [vId]: vInfo }, oId);
