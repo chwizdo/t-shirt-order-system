@@ -103,11 +103,18 @@ const Home = ({ firebase, modelUtil }) => {
             {Object.keys(summaries).map((id) => {
               const summary = { [id]: summaries[id] };
 
+              const image0 = modelUtil.getTreeInfo(summary, "image0");
+              const image1 = modelUtil.getTreeInfo(summary, "image1");
+              const image2 = modelUtil.getTreeInfo(summary, "image2");
+              const image3 = modelUtil.getTreeInfo(summary, "image3");
+              const image = image0 || image1 || image2 || image3;
+
               return (
                 <TableRow
                   key={id}
                   id={modelUtil.getTreeInfo(summary, "id")}
                   order={summary}
+                  image={image}
                   status={status}
                   onEntryClicked={() => history.push(`/${id}`)}
                   onStatusChanged={async (statusId) => {

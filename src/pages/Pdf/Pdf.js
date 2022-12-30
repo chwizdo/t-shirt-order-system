@@ -20,6 +20,11 @@ const Pdf = ({ firebase, modelUtil }) => {
   const [order, setOrder] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
+  const [image0, setImage0] = useState(null);
+  const [image1, setImage1] = useState(null);
+  const [image2, setImage2] = useState(null);
+  const [image3, setImage3] = useState(null);
+
   useEffect(() => {
     if (!orderId) return;
     getOrder();
@@ -29,6 +34,10 @@ const Pdf = ({ firebase, modelUtil }) => {
     setIsLoading(true);
     const order = await firebase.getOrder(orderId);
     setOrder(order);
+    setImage0(modelUtil.getTreeInfo(order, "image0"));
+    setImage1(modelUtil.getTreeInfo(order, "image1"));
+    setImage2(modelUtil.getTreeInfo(order, "image2"));
+    setImage3(modelUtil.getTreeInfo(order, "image3"));
     setIsLoading(false);
   };
 
@@ -142,18 +151,148 @@ const Pdf = ({ firebase, modelUtil }) => {
               ) || "-"}
             </Text>
           </View>
-          <Image
+          <View
             style={{
-              border: "1px",
+              flexDirection: "row",
+              justifyContent: "space-between",
               width: "563px",
-              height: "563px",
-              objectFit: "cover",
+              height: "281px",
               marginBottom: "1px",
-              overflow: "hidden",
-              padding: "1px",
             }}
-            src={modelUtil.getTreeInfo(order, "image")}
-          ></Image>
+          >
+            {image0 && (
+              <Image
+                style={{
+                  border: "1px",
+                  flex: "1",
+                  marginRight: "1px",
+                  height: "100%",
+                  objectFit: "contain",
+                  marginBottom: "1px",
+                  overflow: "hidden",
+                  padding: "1px",
+                }}
+                src={image0}
+              ></Image>
+            )}
+
+            {image0 || (
+              <View
+                style={{
+                  flex: "1",
+                  marginRight: "1px",
+                  height: "100%",
+                  border: "1px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "1px",
+                }}
+              >
+                <Text>No Image Selected</Text>
+              </View>
+            )}
+
+            {image1 && (
+              <Image
+                style={{
+                  border: "1px",
+                  flex: "1",
+                  height: "100%",
+                  objectFit: "contain",
+                  marginBottom: "1px",
+                  overflow: "hidden",
+                  padding: "1px",
+                }}
+                src={image1}
+              ></Image>
+            )}
+
+            {image1 || (
+              <View
+                style={{
+                  flex: "1",
+                  height: "100%",
+                  border: "1px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "1px",
+                }}
+              >
+                <Text>No Image Selected</Text>
+              </View>
+            )}
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              width: "563px",
+              height: "281px",
+              marginBottom: "1px",
+            }}
+          >
+            {image2 && (
+              <Image
+                style={{
+                  border: "1px",
+                  flex: "1",
+                  marginRight: "1px",
+                  height: "100%",
+                  objectFit: "contain",
+                  marginBottom: "1px",
+                  overflow: "hidden",
+                  padding: "1px",
+                }}
+                src={image2}
+              ></Image>
+            )}
+
+            {image2 || (
+              <View
+                style={{
+                  flex: "1",
+                  marginRight: "1px",
+                  height: "100%",
+                  border: "1px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "1px",
+                }}
+              >
+                <Text>No Image Selected</Text>
+              </View>
+            )}
+
+            {image3 && (
+              <Image
+                style={{
+                  border: "1px",
+                  flex: "1",
+                  height: "100%",
+                  objectFit: "contain",
+                  marginBottom: "1px",
+                  overflow: "hidden",
+                  padding: "5px",
+                }}
+                src={image3}
+              ></Image>
+            )}
+
+            {image3 || (
+              <View
+                style={{
+                  flex: "1",
+                  height: "100%",
+                  border: "1px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: "1px",
+                }}
+              >
+                <Text>No Image Selected</Text>
+              </View>
+            )}
+          </View>
           <View
             style={{
               border: "1px",

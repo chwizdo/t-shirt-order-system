@@ -5,6 +5,7 @@ import SelectBox from "../../components/SelectBox";
 import { withModelUtil } from "../../services/ModelUtil";
 import { useState } from "react";
 import { withFirebase } from "../../services/Firebase";
+import ImagePicker from "../../components/ImagePicker";
 
 const FormDetail = ({ order, setOrder, modelUtil, selections, firebase }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -12,8 +13,8 @@ const FormDetail = ({ order, setOrder, modelUtil, selections, firebase }) => {
   const image = modelUtil.getTreeInfo(order, "image");
 
   return (
-    <div className="flex space-x-4 mb-12">
-      <div className="flex-1 space-y-4">
+    <div>
+      <div className="space-y-4 mb-12">
         <ComboBox
           placeholder="Select Customer"
           list={selections.customers}
@@ -80,53 +81,29 @@ const FormDetail = ({ order, setOrder, modelUtil, selections, firebase }) => {
             setOrder(o);
           }}
         />
-      </div>
-      <div className="w-64 space-y-4 flex flex-col">
-        <div className="h-64 rounded-lg overflow-hidden border-2 border-grey">
-          <input
-            type="file"
-            className="hidden"
-            id="image"
-            accept="image/png,image/jpeg"
-            onChange={async (e) => {
-              if (!e.target.files || e.target.files.length === 0) return;
-              setIsUploading(true);
-              const id = modelUtil.getTreeId(order);
-              await firebase.uploadImage(e.target.files[0], id);
-              const image = await firebase.getImageUrl(id);
-              const o = modelUtil.updateTreeInfo(order, "image", image);
-              setOrder(o);
-              setIsUploading(false);
-            }}
-          />
-          {isUploading ? (
-            <div className="h-full w-full flex justify-center items-center">
-              Uploading Image
-            </div>
-          ) : (
-            <label htmlFor="image">
-              {image ? (
-                <img
-                  className="h-full w-full object-cover"
-                  src={modelUtil.getTreeInfo(order, "image")}
-                />
-              ) : (
-                <div className="h-full w-full flex justify-center items-center">
-                  Select Image
-                </div>
-              )}
-            </label>
-          )}
-        </div>
         <textarea
-          className="border-2 border-grey rounded-lg flex-1 py-4 px-6 outline-none focus:border-black transition"
+          className="border-2 border-grey rounded-lg w-full h-32 py-4 px-6 outline-none focus:border-black transition"
           placeholder="Remarks"
-          value={modelUtil.getTreeInfo(order, "remark")}
+          value={modelUtil.getTreeInfo(order, "remark") || ""}
           onChange={(e) => {
             const o = modelUtil.updateTreeInfo(order, "remark", e.target.value);
             setOrder(o);
           }}
         />
+      </div>
+      <div className="grid mb-12 grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="flex-1">
+          <ImagePicker order={order} setOrder={setOrder} index={0} />
+        </div>
+        <div className="flex-1">
+          <ImagePicker order={order} setOrder={setOrder} index={1} />
+        </div>
+        <div className="flex-1">
+          <ImagePicker order={order} setOrder={setOrder} index={2} />
+        </div>
+        <div className="flex-1">
+          <ImagePicker order={order} setOrder={setOrder} index={3} />
+        </div>
       </div>
     </div>
   );

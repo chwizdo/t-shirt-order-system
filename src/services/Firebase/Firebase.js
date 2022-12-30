@@ -197,6 +197,10 @@ class Firebase {
         status: await this.getReferenceValue(orderDoc, "statusRef"),
         id: this.getSingleValue(orderDoc, "id"),
         design: this.getSingleValue(orderDoc, "design"),
+        image0: await this.getImageUrl(`${orderDoc.id}0`),
+        image1: await this.getImageUrl(`${orderDoc.id}1`),
+        image2: await this.getImageUrl(`${orderDoc.id}2`),
+        image3: await this.getImageUrl(`${orderDoc.id}3`),
       };
     }
     return summaries;
@@ -211,7 +215,6 @@ class Firebase {
       try {
         return await getDownloadURL(ref(this.storage, path));
       } catch (e) {
-        console.log(e.code);
         return null;
       }
     }
@@ -241,7 +244,10 @@ class Firebase {
         remark: this.getSingleValue(orderDoc, "remark"),
         status: await this.getReferenceValue(orderDoc, "statusRef"),
         variations: await this.getOrderVariations(orderDoc),
-        image: await this.getImageUrl(orderId),
+        image0: await this.getImageUrl(`${orderId}0`),
+        image1: await this.getImageUrl(`${orderId}1`),
+        image2: await this.getImageUrl(`${orderId}2`),
+        image3: await this.getImageUrl(`${orderId}3`),
         isVisible: this.getSingleBoolean(orderDoc, "isVisible"),
         id: this.getSingleValue(orderDoc, "id"),
         link: this.getSingleValue(orderDoc, "link"),

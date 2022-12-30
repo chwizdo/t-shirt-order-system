@@ -11,10 +11,18 @@ const TableRow = ({
   onEntryClicked = () => {},
   onStatusChanged = () => {},
   modelUtil,
+  image,
 }) => {
   return (
     <div className="flex space-x-4">
-      <div className="w-13 h-13 bg-red-200"></div>
+      {image != null ? (
+        <img
+          src={image}
+          className="w-13 h-13 border-2 border-grey rounded-lg"
+        />
+      ) : (
+        <div className="w-13 h-13 border-2 border-grey rounded-lg"></div>
+      )}
 
       {/* Data Summary */}
 
