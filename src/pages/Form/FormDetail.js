@@ -6,6 +6,8 @@ import { withModelUtil } from "../../services/ModelUtil";
 import { useState } from "react";
 import { withFirebase } from "../../services/Firebase";
 import ImagePicker from "../../components/ImagePicker";
+import { Link } from "react-router-dom";
+import TextButton from "../../components/TextButton";
 
 const FormDetail = ({ order, setOrder, modelUtil, selections, firebase }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -73,14 +75,21 @@ const FormDetail = ({ order, setOrder, modelUtil, selections, firebase }) => {
             setOrder(o);
           }}
         />
-        <TextField
-          placeholder="Google Drive Link"
-          value={modelUtil.getTreeInfo(order, "link")}
-          onChanged={(value) => {
-            const o = modelUtil.updateTreeInfo(order, "link", value);
-            setOrder(o);
-          }}
-        />
+        <div className="flex space-x-4">
+          <div className="flex-1">
+            <TextField
+              placeholder="Google Drive Link"
+              value={modelUtil.getTreeInfo(order, "link")}
+              onChanged={(value) => {
+                const o = modelUtil.updateTreeInfo(order, "link", value);
+                setOrder(o);
+              }}
+            />
+          </div>
+          <a href={modelUtil.getTreeInfo(order, "link")} target="_blank">
+            <TextButton text="Open Link" />
+          </a>
+        </div>
         <textarea
           className="border-2 border-grey rounded-lg w-full h-32 py-4 px-6 outline-none focus:border-black transition"
           placeholder="Remarks"

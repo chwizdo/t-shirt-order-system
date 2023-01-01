@@ -73,10 +73,6 @@ const Form = ({ firebase, modelUtil }) => {
     const design = modelUtil.getTreeInfo(order, "design");
     if (!design) return "Invalid design name";
 
-    // validate image.
-    const image = modelUtil.getTreeInfo(order, "image");
-    if (!image) return "Image field is empty";
-
     // validate date.
     const date = modelUtil.getTreeInfo(order, "date");
     if (!date) return "Invalid date";
